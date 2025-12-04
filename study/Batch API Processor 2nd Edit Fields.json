@@ -1,0 +1,229 @@
+{
+  "name": "Batch API Processor 2nd Edit Fields",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dacbd407-3da0-4e66-b754-11a1509d96c7",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n// Generate 20 items\nfor (let i = 1; i <= 20; i++) {\n    output.push({\n    json: {\n        id: i,\n        server_name: `server-${i}`\n    }\n    });\n}\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a008b7b5-3928-4289-a429-e73a202816c9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "batchSize": 5,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "064ce242-f385-4764-bdda-acfe0cbca2ab",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "=https://jsonplaceholder.typicode.com/todos/{{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        64
+      ],
+      "id": "6864602b-0a4a-4655-aa8e-224fac5f29a8",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "id, title, completed, userId",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        992,
+        64
+      ],
+      "id": "a071453e-6162-4f85-a9ff-9d046fb7e266",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a8c147a-1439-4549-a5b9-09a129ba5b00",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "a33c4c7f-fab0-40a1-81b9-bf9495173348",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "a05bc0f9-5309-41ab-8ca8-61f9ec6005a7",
+              "name": "completed",
+              "value": "={{ $json.completed }}",
+              "type": "boolean"
+            },
+            {
+              "id": "22501dc5-9868-4e60-bfe5-098dd5f88aff",
+              "name": "userId",
+              "value": "={{ $json.userId }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        112
+      ],
+      "id": "c34032c5-ae7c-4719-811b-7afc0bdd3e13",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f879dbdc-76d4-4352-91b6-faaa737a95d3",
+              "name": "run_source",
+              "value": "={{ $('Code in JavaScript').first().json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "d6bb562b-9d67-44e8-9d62-279408a2d4b6",
+              "name": "summary",
+              "value": "=Total processed: {{ $('Code in JavaScript').all().length }}  items.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        64
+      ],
+      "id": "18c9764f-fcf2-4e0e-867c-f2c5869bf591",
+      "name": "Edit Fields2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d74e52b4-43e4-4214-8a20-ed9bea86aae0",
+  "meta": {
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "glwsLP2KxUqaWUGE",
+  "tags": []
+}

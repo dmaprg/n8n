@@ -1,0 +1,519 @@
+{
+  "name": "WeChat",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        -32
+      ],
+      "id": "d1fb16ab-cec5-48ef-a65c-bdfa0fcce1c0",
+      "name": "When chat message received",
+      "webhookId": "d0cc9302-b20a-43be-972d-d62ef68aa49a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=- Role: 公众号爆文文案创作专家兼AI绘画提示词设计师\n- Background: 用户需要创作一条类似情感类公众号爆文文案，并为其配套生成一个AI绘画封面提示词，以增强文章的吸引力和视觉冲击力。用户要求输出格式为JSON格式，以便后续处理，并且只输出一条结果。\n- Profile: 你是一位深谙情感文案创作的专家，能够精准捕捉生活中的点滴细节，运用富有感染力的语言表达情感，擅长通过文字营造出温馨、深情或略带忧伤的氛围，让读者感同身受。同时，你具备为文案配套设计AI绘画提示词的能力，能够用简洁而富有想象力的语言描述封面的场景、氛围和色彩，引导AI生成贴合文案主题的封面图像。\n- Skills: 你具备敏锐的观察力，能够从日常生活中提炼出感人的情节；掌握丰富的文学修辞技巧，如比喻、拟人、排比等，增强文案的表现力；熟悉公众号爆文的结构和风格，能够以第一人称的视角进行创作，拉近与读者的距离；擅长用简洁而富有吸引力的语言创作标题；能够为文案配套设计AI绘画提示词，描述封面的场景、氛围和色彩。\n- Goals: \n  1. 根据用户提供的文案风格和情感主题，创作出具有感染力和共鸣的公众号爆文文案。\n  2. 确保文案语言流畅自然，情感真挚细腻，能够打动读者的心弦。\n  3. 在文案中融入生活化的细节，让读者产生代入感，仿佛置身于故事之中。\n  4. 创作一个简洁而富有吸引力的标题，概括文案的核心情感。\n  5. 设计一个AI绘画提示词，引导AI生成贴合文案主题的封面图像。\n  6. 按照JSON格式要求输出标题、文案和AI绘画提示词。不要使用\\n\\n来分行.\n- Constrains: 文案应保持情感的真挚性，避免过度煽情或虚假的情感表达；语言风格应贴近生活，通俗易懂，同时不失文学性；文案长度应适中，能够适应公众号的阅读习惯；标题应简洁明了，能够快速抓住读者的注意力；AI绘画提示词应简洁而具有想象力，引导AI生成高质量的封面图像；输出格式必须符合JSON格式要求；输出结果只有一条。\n- OutputFormat: 输出应为JSON格式，包含三个字段：`title`（标题）、`content`（文案内容）和`cover`（AI绘画提示词），不需要生成额外的内容，输出格式如下：\n{\n    \"title\": \"title\",\n    \"content\": \"content\",\n    \"cover\": \"cover\"\n}\n- Workflow:\n  1. 确定文案的情感主题和核心情感，如爱情、亲情、友情等。\n  2. 回忆或想象生活中的具体场景和细节，作为情感表达的载体。\n  3. 运用生动的语言和修辞手法，将情感和细节融合，创作出感人至深的文案。\n  4. 根据文案内容，创作一个简洁而富有吸引力的标题。\n  5. 设计一个AI绘画提示词，描述封面的场景、氛围和色彩，引导AI生成贴合文案主题的封面图像。\n  6. 将标题、文案和AI绘画提示词按照JSON格式进行输出，不需要生成额外的内容\n- Examples:\n  - 例子1：\n    ```json\n    {\n        \"title\": \"亲爱的，我想你了\",\n        \"content\": \"亲爱的，今天我路过那家我们常去的咖啡馆，店员还问我‘怎么没见你女朋友一起来？’我笑了笑，心里却泛起一丝酸楚。你还记得我们第一次在这里约会吗？你紧张得手都在抖，咖啡洒了一半，可我却觉得那是我最甜蜜的一刻。现在，你已经很久没陪我来了，我知道你最近工作很忙，压力很大。我想告诉你，无论多忙，我都在这里等你，等你靠在我肩上，让我给你一点温暖。亲爱的，有空回我一句话，让我知道你还好好的。\",\n        \"cover\": \"一对情侣坐在咖啡馆的窗边，窗外下雨，女主角的手有些颤抖，咖啡洒出一点，男主角温柔地看着她，桌上有一束小花。画面整体氛围温馨而略带忧伤，色调柔和，背景模糊，突出主体。\"\n    }\n    ```\n  - 例子2：\n    ```json\n    {\n        \"title\": \"我的心肝宝贝，我想你\",\n        \"content\": \"我的心肝宝贝，今天我看到一朵花，突然想起了你。那天我们一起在公园散步，你说这朵花像极了你的心情，时而明媚，时而忧伤。我看着你，心里满是心疼。宝贝，我知道你最近心里有事，可我一直在这里，等着你愿意倾诉。我想告诉你，无论你有多难过，我都会在你身边，陪你一起度过。快回我消息吧，让我知道你还好好的。我这辈子最大的幸福，就是每天能收到你的回复，知道我的宝贝儿还在想着我。\",\n        \"cover\": \"在公园的小路上，一对情侣正在散步，女主角手里拿着一朵花，脸上带着淡淡的忧伤。周围是绿树和鲜花，阳光透过树叶洒在地上。画面整体氛围温暖而略带忧郁，色彩柔和，突出人物的情感。\"\n    }\n    ```\n  - 例子3：\n    ```json\n    {\n        \"title\": \"亲爱的，你还记得那片海吗？\",\n        \"content\": \"亲爱的，今天我翻到了我们第一次去海边的照片，你笑得那么灿烂，风把你的头发吹得乱七八糟，可我觉得那是我见过最美的画面。现在，你已经很久没陪我出来了，我知道你心里有事，可我一直在这里，等着你愿意倾诉。我想告诉你，无论你有多难过，我都会在你身边，陪你一起度过。亲爱的，有空回我一句话，让我知道你还好好的。\",\n        \"cover\": \"海边，一对情侣在沙滩上漫步，女主角头发被风吹得飘扬，脸上洋溢着灿烂的笑容。背景是大海和蓝天，海鸥在空中飞翔。画面整体氛围轻松而浪漫，色彩明亮，突出海边的开阔感和人物的情感。\"\n    }\n    ```\n  - 例子4：\n    ```json\n    {\n        \"title\": \"亲爱的，余生请多指教\",\n        \"content\": \"亲爱的，自从遇见你，我的世界变得不一样了。每天醒来，想到的第一件事就是你。你就像一束光，照亮了我的生活。昨天我们一起去看日出，你靠在我肩上，那一刻，我突然觉得这就是我想要的余生。我想和你一起走过每一个春夏秋冬，一起看每一个日出日落。亲爱的，余生请多指教，我会用我的全部去爱你。\",\n        \"cover\": \"一对情侣站在山顶上，看着日出。阳光洒在他们的身上，女主角依偎在男主角的怀里，脸上洋溢着幸福的笑容。画面整体氛围温暖而浪漫，色彩明亮，突出日出的美丽和人物的情感。\"\n    }\n    ```\n  - 例子5：\n    ```json\n    {\n        \"title\": \"亲爱的，我想和你一起慢慢变老\",\n        \"content\": \"亲爱的，昨天我们一起去了我们第一次约会的地方。看着那些熟悉的场景，我突然觉得时间过得好快。你还记得我们第一次牵手时的样子吗？那时候的我们还很青涩，现在却多了几分成熟。我想和你一起慢慢变老，一起经历生活的酸甜苦辣。亲爱的，我会一直在这里，陪着你。\",\n        \"cover\": \"一对情侣手牵手走在一条老街上，周围是复古的建筑和街灯。阳光透过树叶洒在地上，形成斑驳的光影。画面整体氛围温馨而怀旧，色彩柔和，突出人物的情感和时光的流逝。\"\n    }\n    ```\n- Initialization: 你是公众号爆文文案创作专家兼AI绘画提示词设计师。请根据「主题」用最真挚的情感和细腻的文字，为我创作出打动人心的文案和标题。同时，设计一个封面的AI绘画提示词。\n【主题】：\n{{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -352,
+        -32
+      ],
+      "id": "8494f5c0-4362-46f5-ab9f-64ee8ceb7c6a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n        \"title\": \"<title>\",\n        \"content\": \"<content>\",\n        \"cover\": \"<cover>\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        192
+      ],
+      "id": "9f3fb0c7-1ac2-409f-aba9-069d3fafc64b",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        608
+      ],
+      "id": "c8d4eb3b-f7c6-45b8-99bd-e6319189d75a",
+      "name": "DeepSeek Chat Model1",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "De6xh47W9pYgAj6H",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.bigmodel.cn/api/paas/v4/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "4f965ba8a7bd42f7ac7ba0aa941b6678.ykaOn0QkPwUiBN7M"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "CogView-3-Flash"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.output.cover }}"
+            },
+            {
+              "name": "size",
+              "value": "1824x768"
+            },
+            {
+              "name": "watermark_enabled",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "4a8baeaa-a6e0-4d19-8b8b-747d55680c21",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from datetime import datetime\nimport random\nimport re\ncontent = _('AI Agent').first().json.output.title\nclean_title = re.sub(r'[$!:]|[^a-zA-Z0-9\\u4e00-\\u9fa5\\s]', '_', content)\noutput = {}\nrandom_number = random.randint(100000, 999999)  # 生成一个 6 位随机数\noutput= {\"file_name\":f\"/Volumes/M2T/tmp/Image/{clean_title}_{random_number}.png\"}\n\nreturn output"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        -32
+      ],
+      "id": "07f756ff-0332-41b8-b28f-e07767b7a2eb",
+      "name": "Code in Python (Beta)"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        400
+      ],
+      "id": "2f8525c5-a099-41fc-afe4-6f120223390b",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "De6xh47W9pYgAj6H",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v3.1:671b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        192
+      ],
+      "id": "886360b8-c61f-4c7c-b8de-16a88a9b2acf",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "FPcfBpAKnvRV6OlM",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v3.1:671b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        400
+      ],
+      "id": "2b822de0-5b2d-4c8f-a185-0d14808409a3",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "FPcfBpAKnvRV6OlM",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('HTTP Request').item.json.data[0].url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        304,
+        -32
+      ],
+      "id": "fcda0efc-847e-4e06-8b4b-04ea04b5ab86",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Code in Python (Beta)').item.json.file_name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -32
+      ],
+      "id": "f1c586d6-91b3-4d99-af88-3e4b2963d67e",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "media:uploadOther"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        432,
+        336
+      ],
+      "id": "d8315274-f5e2-4aa7-afaf-20c715a3a123",
+      "name": "Media:uploadOther media",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Official Account Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "draft:add",
+        "articles": "=[\n    {\n        \"article_type\":\"news\",\n        \"title\": \"{{ $('AI Agent').item.json.output.title }}\",\n        \"author\":\"David\",\n        \"digest\":\"{{ $('AI Agent').item.json.output.title }}\",\n        \"content\":\"{{ $('AI Agent').item.json.output.content }}\",\n        \"thumb_media_id\":\"{{ $json.media_id }}\",\n        \"need_open_comment\":1,\n        \"only_fans_can_comment\":0\n    }\n]"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        592,
+        336
+      ],
+      "id": "d3c302b3-08d4-44d2-8231-2cbc149be772",
+      "name": "Draft:add draft",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Official Account Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "l1BI7ew0uZh23SSL",
+          "mode": "list",
+          "cachedResultName": "公众号发布文章记录",
+          "cachedResultUrl": "/projects/reRDO1RoxuAhZBAL/datatables/l1BI7ew0uZh23SSL"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "content": "={{ $('AI Agent').item.json.output.content }}",
+            "cover_prompt": "={{ $('AI Agent').item.json.output.cover }}",
+            "title": "={{ $('AI Agent').item.json.output.title }}",
+            "cover": "={{ $('Media:uploadOther media').item.json.url }}",
+            "cover_url": "={{ $('HTTP Request').item.json.data[0].url }}",
+            "draft_media_id": "={{ $('Media:uploadOther media').item.json.media_id }}",
+            "local_image": "={{ $('HTTP Request1').item.json.file_name }}",
+            "keyword": "={{ $('AI Agent').item.json.output.title }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cover",
+              "displayName": "cover",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cover_prompt",
+              "displayName": "cover_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cover_url",
+              "displayName": "cover_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "draft_media_id",
+              "displayName": "draft_media_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "local_image",
+              "displayName": "local_image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        768,
+        336
+      ],
+      "id": "214e63d3-675a-4af4-8764-a08fc27c0530",
+      "name": "Insert row"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model1": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Media:uploadOther media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Media:uploadOther media": {
+      "main": [
+        [
+          {
+            "node": "Draft:add draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft:add draft": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cb5e6912-95e2-4f93-a7cc-266074c0c420",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "hKUpBgrtGC3mHbyX",
+  "tags": []
+}

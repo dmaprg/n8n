@@ -1,0 +1,121 @@
+{
+  "name": "Log Parser",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0896f98f-1c3f-4314-87ee-fd68fcb14429",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { raw_log: \"2025-11-27 10:15:30 [INFO] [192.168.1.10] User login successful\" } },\n  { json: { raw_log: \"2025-11-27 10:16:05 [Error] [10.0.0.5] DB_CONN_TIMEOUT: Retrying...\" } },\n  { json: { raw_log: \"2025-11-27 10:17:12 [WARN] [192.168.1.10] High memory usage: 85%\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fb2b2e46-baa1-4cd2-a20e-f56bee4b1deb",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define the Regex Pattern\n// Group 1: Timestamp\n// Group 2: Level (inside brackets)\n// Group 3: IP (inside brackets)\n// Group 4: The rest of the message\nconst regex = /^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}) \\[(.*?)\\] \\[(.*?)\\] (.*)$/;\n\n// Process each item\nfor (const item of $input.all()) {\n  const logLine = item.json.raw_log;\n  const match = logLine.match(regex);\n\n  if (match) {\n    // If regex matches, create structured fields\n    item.json.timestamp = match[1];\n    item.json.level = match[2].toUpperCase();\n    item.json.ip = match[3];\n    item.json.message = match[4];\n    item.json.parsed = true;\n  } else {\n    // Handle parse failures\n    item.json.parsed = false;\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a75f6642-7f92-4e19-b572-bfa60aac07a1",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f0651c07-b770-4c6b-b042-abe34f5529e0",
+              "leftValue": "={{ $json.level }}",
+              "rightValue": "ERROR",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "3d5ff5a7-07a9-452c-abe3-22742297d1db",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5415640f-c383-4d15-af56-05aa828222f8",
+  "meta": {
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "yrAiOPfWIITxVP8m",
+  "tags": []
+}

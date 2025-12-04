@@ -1,0 +1,53 @@
+{
+  "name": "Global Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b7e0771f-77ac-4fdf-8d3f-bb9d0dc76fcb",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construct the URL to the failed execution\nconst baseUrl = 'http://localhost:5678'; // Change to your public domain\nconst execId = $execution.id;\nconst workflowId = $workflow.id;\n\nreturn {\n    json: {\n        alert: \"WORKFLOW CRASHED\",\n        workflow: $workflow.name,\n        node: $node[\"Error Trigger\"].json.execution.lastNodeExecuted,\n        error: $node[\"Error Trigger\"].json.execution.error.message,\n        link: `${baseUrl}/workflow/${workflowId}/executions/${execId}`\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "100056a5-c53d-4b8f-8355-5fa0e7911b47",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d52172e0-64b7-4b11-a92d-851dbb5f3d13",
+  "meta": {
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "1DWh2gRvtFNvFLJf",
+  "tags": []
+}

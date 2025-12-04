@@ -1,0 +1,163 @@
+{
+  "name": "Ultimate Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a3cc07a9-afac-4d22-b3a9-0db2e7981324",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://httpbin.org/status/200",
+        "options": {
+          "allowUnauthorizedCerts": false,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6fb37126-d096-4236-aa60-4f56aca9c3fd",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cb8b74f8-d255-4ea3-b9bb-24883e0ff6c7",
+              "leftValue": "={{ $json.statusCode }} ",
+              "rightValue": "=200",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "caa7f5b6-255f-4e8d-acc0-6e948e976f7f",
+              "leftValue": "={{ $json.error.status }}",
+              "rightValue": "=200",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "ad52397c-1f2a-4028-ad27-8591d5a3aaac",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "fromEmail": "dmzq77@gmail.com",
+        "toEmail": "davidmzq@outlook.com",
+        "subject": "Alert",
+        "html": "=Alert! Website is down. Status Code: {{ $('HTTP Request').item.json.statusCode }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "dd7c75d3-b34c-4b68-92f5-7e85b572fff3",
+      "name": "Send email",
+      "webhookId": "86c7de70-1ea2-406f-951e-1feba3a5b6df",
+      "credentials": {
+        "smtp": {
+          "id": "w9UTbc71TcnP4vxD",
+          "name": "SMTP account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedPerExecution": 1
+  },
+  "versionId": "1f3e17a3-6f4f-4306-b715-20e56f87fe21",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "CAnT6ebxM6OItt1r",
+  "tags": []
+}
