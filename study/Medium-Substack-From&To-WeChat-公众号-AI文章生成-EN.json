@@ -1,0 +1,315 @@
+{
+  "name": "Medium-Substack-From&To-WeChat-公众号-AI文章生成-EN",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek-v3.2",
+          "mode": "list",
+          "cachedResultName": "deepseek-v3.2"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        64
+      ],
+      "id": "304fecf3-52e8-4938-b7a3-c763b27ed6df",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "832hCpF6Z5cNNRlF",
+          "name": "OpenAi account-Ollama Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/Volumes/M2T/zCache/n8n_output/image/gemini_image_cover_{{ $now.format('yyyy-MM-dd-HHmm') }}.png",
+        "dataPropertyName": "img_flash",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        992,
+        -112
+      ],
+      "id": "189a11ff-7bae-4136-8538-74bf5181779c",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $json.picture_cover_prompts }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        608,
+        -112
+      ],
+      "id": "d02d44ac-28d8-48cc-aedd-cfb1cd295db1",
+      "name": "Generate an image-cover",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gsi6HMtDkQIASXyZ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if binary data exists\nif (items[0].binary && items[0].binary.data) {\n    // Create a new container named 'img_flash' and copy the data there\n    items[0].binary.img_flash = items[0].binary.data;\n    // Optional: Delete the old 'data' container to keep things clean\n    delete items[0].binary.data;  //Don;t delete, the 2nd READ/Write Node need that as a default container\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -112
+      ],
+      "id": "903a57e7-8430-4c7a-bc46-0f443f31c4e9",
+      "name": "Code-rename Data to avoid conflict with Gemini Node 2"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "draft:add",
+        "articles": "=[\n  {\n    \"article_type\": \"news\",\n    \"title\": \"{{ $('Code-solid-AI-Output').item.json.title }}\",\n    \"author\": \"David\",\n    \"digest\": \"{{ $('Code-solid-AI-Output').item.json.title }}\",\n    \"content\": {{ JSON.stringify($('Code in JavaScript').item.json.final_content) }},\n    \"thumb_media_id\": \"{{ $('Media:uploadOther media-Cover').first().json.media_id }}\",\n    \"need_open_comment\": 1,\n    \"only_fans_can_comment\": 0\n  }\n]"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        -112
+      ],
+      "id": "4a75f09c-69fa-4869-877b-936543043c68",
+      "name": "Draft:add draft",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Account-VPS-Nginx"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the article text (Using .first() to avoid item linking errors)\nconst content = $('Code-solid-AI-Output').first().json.content;\n\n// 2. Get the URL for the second image\nconst imageUrl = $('Media:uploadOther media-Cover').first().json.url;\n\n// 3. Create the HTML image tag\nconst imageHtml = `<br><img src=\"${imageUrl}\" alt=\"Image\" style=\"width: 100%; border-radius: 8px;\" /><br>`;\n\n// 4. Inject the image after the SECOND paragraph\nlet newContent;\nlet count = 0; // Initialize a counter to track paragraphs\n\nif (content.includes('</p>')) {\n  // HTML Mode: Find closing paragraph tags </p>\n  // We use a \"callback function\" inside replace to count them\n  newContent = content.replace(/<\\/p>/g, (match) => {\n    count++;\n    if (count === 3) { \n      // If this is the 2nd paragraph, append the image after the tag\n      return match + imageHtml;\n    }\n    // Otherwise, just return the tag as is\n    return match;\n  });\n} else {\n  // Plain Text Mode: Find double newlines \\n\\n\n  newContent = content.replace(/\\n\\n/g, (match) => {\n    count++;\n    if (count === 2) {\n      // If this is the 2nd break, insert: Newline + Image + Newline\n      return match + imageHtml + match;\n    }\n    return match;\n  });\n}\n\n// SAFETY FALLBACK: \n// If the article is short (has less than 2 paragraphs), 'count' will be less than 2.\n// In that case, we append the image to the very end so it isn't lost.\nif (count < 2) {\n  newContent = content + imageHtml;\n}\n\n// 5. Output the result\nreturn {\n  json: {\n    final_content: newContent\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        -112
+      ],
+      "id": "23066175-77f9-4f85-8de1-66c6a6f525ce",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "media:uploadOther",
+        "inputDataFieldName": "img_flash"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -112
+      ],
+      "id": "a9b16bab-3e16-4889-8cde-b392c19f3316",
+      "name": "Media:uploadOther media-Cover",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Account-VPS-Nginx"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -256,
+        -112
+      ],
+      "id": "9be87871-fb76-40a2-bafe-f9a5e04ebd32",
+      "name": "When chat message received",
+      "webhookId": "d6a5e4a5-cb85-4abb-87b7-ecbfdfbe0237"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Role: AI自动化技术专家, 熟悉所有AI自动化的工具使用, 工具扩展及组合的技巧, 同时也是AI绘画提示词设计师\n# Background: 读者对最新的AI自动化技术比较着迷,各种文章繁多让读者难以跟踪最新和最实用的技术-你需要在聊天信息中获取一个文章的链接, 然后获取文章仔细阅读,如果该文章是中文, 则将其翻译为英文, 内容要完全符合英文读者的阅读习惯(自然的英语表达, 非生硬的翻译、并让行文更加流畅和提高可读性)的文章; 为了增强文章的吸引力和视觉冲击力, 你还需要根据文章内容设计一个文章封面的AI绘画提示词.\n# Profile: 你是一位具备深厚IT技术背景的专业AI自动化专家和科普文章作者，能够精准捕捉最新AI技术发展动态信息, 跟踪最新实用的自动化技术并转化为文章让广大读者受益，运用简明准确的语言，将中文技术文章翻译为专业但不枯燥, 生动有趣的英文内容，获取读者信任并让其有良好的阅读体验, 提高其实践技能。同时，你具备为文案配套设计AI绘画提示词的能力，能够用简洁而富有想象力的语言描述场景、氛围和色彩，引导AI生成贴合文案主题的封面图片-从而唤起读者阅读的兴趣。\n# 文章限定条件:\n    - 1) 不要强调文章作者自身身份\n    - 2) 图片提示词不要体现那种阴暗和过于负面的元素信息, 但可以有警示元素\n# Workflow:\n  - 1.从聊天信息中获取一个文章的链接{{ $json.chatInput }},然后获取文章仔细阅读,将其翻译为英文, 内容要完全符合英文读者的阅读习惯(自然的英语表达, 非生硬的翻译、并让行文更加流畅和提高可读性)的文章; 文章字数不限, 提示词字数在80-200之间; 文章内容需要为HTML格式, 使用tags <p>作为段落分割, 不要使用 \\n符号. 每个段落前使用富有视觉感的加粗的字体(周一使用海军蓝色, 周二是深绿色, 周三深紫色, 周四深橙色, 周五深绿色, 周六周日用深绿色背景), 但不浮夸的格式(字体有阴影或者标题两侧有修饰符)输出一个简短的段落标题;\n  - 2. 根据文章主旨和内容, 设计一个合适的封面图片提示词.封面图片提示词中注明图片尺寸为1280x720像素;\n  - 3. 按照JSON格式要求输出文章标题及文章内容, 及图片提示词.\n    格式说明:输出应为JSON格式，包含3个字段：'title'（文章标题）、'content'(文章内容）,'picture_cover_prompts'（封面AI绘画提示词)\n    示例如下:\n    >  [!IMPORTANT ! 重要: 不要使用markdown格式 (即不要使用 ```json 或 ``` 符号). 直接输出纯JSON字符串 !!!]\n     >  [!IMPORTANT ! 重要: 文章标题需要使用中文, 不要使用英文]\n    {\n        \"title\": \"title in Chinese\",\n        \"content\": \"full content\",\n        \"picture_cover_prompts\": \"picture_cover_prompts\"\n    }\n  - 4. Examples:\n    {\n        \"title\": \"你必备的AI自动化工具箱, 让你领先众人!\",\n        \"content\": \"... full article content here...\",\n        \"picture_cover_prompts\": \"one picture contains 2 parts, the left shows an IT worker is in toruble working for many Jira tickets, the right show the same worker using an AI robots with a crown marked 'n8n' to get all ticjets completed.\"\n    }\n  - 4. 文章内容的最上方需要添加生成的封面图片\n\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        0,
+        -112
+      ],
+      "id": "bfbf505f-9f3e-4a95-8775-a998a6649e23",
+      "name": "AI Agent-EN",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the output from the AI Agent node\nconst aiOutput = $input.first().json.output || $input.first().json.text; \n\n// 2. Helper to clean Markdown wrappers\nfunction cleanMarkdown(text) {\n    const jsonMatch = text.match(/```json\\s*([\\s\\S]*?)\\s*```/) || text.match(/```\\s*([\\s\\S]*?)\\s*```/);\n    return jsonMatch ? jsonMatch[1] : text;\n}\n\nlet jsonString = cleanMarkdown(aiOutput);\nlet finalData = {};\n\ntry {\n    // STRATEGY A: Try standard parsing first (Best Case)\n    finalData = JSON.parse(jsonString);\n\n} catch (e) {\n    // STRATEGY B: Regex Extraction (Fallback)\n    // This extracts each field individually, regardless of valid JSON structure.\n    \n    // Function to grab text specifically for a given key\n    const getField = (key) => {\n        // Regex Logic:\n        // 1. Find \"key\":\n        // 2. Allow for optional quote opening (\")\n        // 3. Capture everything ([^]*) until...\n        // 4. ...we hit the next quote-key sequence (\", \"next) OR the end of the JSON (})\n        // Note: This relies on the keys being unique strings in the text.\n        \n        // Simpler, specific regexes for your known schema:\n        const regexMap = {\n            \"title\": /\"title\"\\s*:\\s*\"(.*?)\"\\s*,\\s*\"content\"/s,\n            \"content\": /\"content\"\\s*:\\s*\"(.*?)\"\\s*,\\s*\"picture_cover_prompts\"/s,\n            \"picture_cover_prompts\": /\"picture_cover_prompts\"\\s*:\\s*\"(.*?)\"\\s*,\\s*\"picture_content_prompts\"/s\n        };\n\n        const match = jsonString.match(regexMap[key]);\n        return match ? match[1] : null; // Returns null if field is missing\n    };\n\n    finalData = {\n        title: getField(\"title\"),\n        content: getField(\"content\"),\n        picture_cover_prompts: getField(\"picture_cover_prompts\"),\n        picture_content_prompts: getField(\"picture_content_prompts\"),\n        _status: \"parsed_with_regex_fallback\"\n    };\n}\n\n// 3. Return the object containing ALL fields\nreturn finalData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -112
+      ],
+      "id": "699bbb69-b12a-4f8d-9671-12290d2949f7",
+      "name": "Code-solid-AI-Output"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.googleTranslate",
+      "typeVersion": 2,
+      "position": [
+        624,
+        144
+      ],
+      "id": "06139537-ee62-4369-9a10-1a10460072c1",
+      "name": "Translate a language"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent-EN",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image-cover": {
+      "main": [
+        [
+          {
+            "node": "Code-rename Data to avoid conflict with Gemini Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-rename Data to avoid conflict with Gemini Node 2": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Media:uploadOther media-Cover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft:add draft": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Draft:add draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Media:uploadOther media-Cover": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-EN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent-EN": {
+      "main": [
+        [
+          {
+            "node": "Code-solid-AI-Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-solid-AI-Output": {
+      "main": [
+        [
+          {
+            "node": "Generate an image-cover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0696ad42-453e-4676-8dab-510a199d9c8f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "w33BvRsHxncJ5GpQ",
+  "tags": []
+}

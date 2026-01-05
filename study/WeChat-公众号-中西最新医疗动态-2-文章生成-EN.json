@@ -1,0 +1,590 @@
+{
+  "name": "WeChat-公众号-中西最新医疗动态-2-文章生成-EN",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        80
+      ],
+      "id": "dd5c2a63-8d59-41f9-bc5f-24d92de23869",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "832hCpF6Z5cNNRlF",
+          "name": "OpenAi account-Ollama Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"title\": \"<title>\",\n  \"content\": \"<full_content>\",\n  \"picture_cover_prompts\": \"<picture_cover_prompts>\",\n  \"picture_content_prompts\": \"<picture_content_prompts>\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        80
+      ],
+      "id": "7afc8766-8cae-4189-8a35-a519e1d99b59",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        256
+      ],
+      "id": "be44b7ac-2848-4d24-9bc9-da978c216e75",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "832hCpF6Z5cNNRlF",
+          "name": "OpenAi account-Ollama Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE",
+          "mode": "list",
+          "cachedResultName": "中西医学博览-微信公众号",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Article-Chosen",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "date",
+              "lookupValue": "={{ $now.toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        -128
+      ],
+      "id": "6bacb737-f697-4093-93a2-94a322bdc71b",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Q1salEETFZjoO8bO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "5d344e5d-c997-4b31-b997-23587f9bb2d9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        -160
+      ],
+      "id": "086d27cf-6cf2-4390-a40b-e8d24596e46e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/Volumes/M2T/zCache/n8n_output/image/gemini_image_cover_{{ $now.format('yyyy-MM-dd-HHmm') }}.png",
+        "dataPropertyName": "img_flash",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        -112
+      ],
+      "id": "98e88a45-f08b-4f33-a398-2583f40d0e71",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/Volumes/M2T/zCache/n8n_output/image/gemini_image_content_{{ $now.format('yyyy-MM-dd-HHmm') }}.png",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        96
+      ],
+      "id": "7b2715a6-dd6c-4ef2-9f07-a5eca1948b16",
+      "name": "Read/Write Files from Disk2"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $json.output.picture_cover_prompts }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        896,
+        -112
+      ],
+      "id": "2c41a1cd-8bb6-471d-a392-f3052c5ec68a",
+      "name": "Generate an image-cover",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gsi6HMtDkQIASXyZ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if binary data exists\nif (items[0].binary && items[0].binary.data) {\n    // Create a new container named 'img_flash' and copy the data there\n    items[0].binary.img_flash = items[0].binary.data;\n    // Optional: Delete the old 'data' container to keep things clean\n    delete items[0].binary.data;  //Don;t delete, the 2nd READ/Write Node need that as a default container\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        -112
+      ],
+      "id": "05145485-8948-46ae-b5ec-a30bf75942e3",
+      "name": "Code-rename Data to avoid conflict with Gemini Node 2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1728,
+        -48
+      ],
+      "id": "3729c22b-3442-45e1-9852-4f3c2c9d45ff",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "draft:add",
+        "articles": "=[\n  {\n    \"article_type\": \"news\",\n    \"title\": \"{{ $('AI Agent-EN').item.json.output.title }}\",\n    \"author\": \"David\",\n    \"digest\": \"{{ $('AI Agent-EN').item.json.output.title }}\",\n    \"content\": {{ JSON.stringify($('Code in JavaScript').item.json.final_content) }},\n\n    \"thumb_media_id\": \"{{ $('Media:uploadOther media-Cover').first().json.media_id }}\",\n    \"need_open_comment\": 1,\n    \"only_fans_can_comment\": 0\n  }\n]"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        2112,
+        -144
+      ],
+      "id": "6a595b78-e509-4f89-98eb-6b6f893c2249",
+      "name": "Draft:add draft",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Account-VPS-Nginx"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the article text (Using .first() to avoid item linking errors)\nconst content = $('AI Agent-EN').first().json.output.content;\n\n// 2. Get the URL for the second image\nconst imageUrl = $('Media:uploadOther media-Content').first().json.url;\n\n// 3. Create the HTML image tag\nconst imageHtml = `<br><img src=\"${imageUrl}\" alt=\"Image\" style=\"width: 100%; border-radius: 8px;\" /><br>`;\n\n// 4. Inject the image after the SECOND paragraph\nlet newContent;\nlet count = 0; // Initialize a counter to track paragraphs\n\nif (content.includes('</p>')) {\n  // HTML Mode: Find closing paragraph tags </p>\n  // We use a \"callback function\" inside replace to count them\n  newContent = content.replace(/<\\/p>/g, (match) => {\n    count++;\n    if (count === 3) { \n      // If this is the 2nd paragraph, append the image after the tag\n      return match + imageHtml;\n    }\n    // Otherwise, just return the tag as is\n    return match;\n  });\n} else {\n  // Plain Text Mode: Find double newlines \\n\\n\n  newContent = content.replace(/\\n\\n/g, (match) => {\n    count++;\n    if (count === 2) {\n      // If this is the 2nd break, insert: Newline + Image + Newline\n      return match + imageHtml + match;\n    }\n    return match;\n  });\n}\n\n// SAFETY FALLBACK: \n// If the article is short (has less than 2 paragraphs), 'count' will be less than 2.\n// In that case, we append the image to the very end so it isn't lost.\nif (count < 2) {\n  newContent = content + imageHtml;\n}\n\n// 5. Output the result\nreturn {\n  json: {\n    final_content: newContent\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        96
+      ],
+      "id": "4455ba00-5491-45c0-bfb8-d24fcfc1d7ed",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "media:uploadOther",
+        "inputDataFieldName": "img_flash"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        -112
+      ],
+      "id": "9384f1b6-bd60-4807-b5e4-57c6ad0fee4a",
+      "name": "Media:uploadOther media-Cover",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Account-VPS-Nginx"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "media:uploadOther"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        96
+      ],
+      "id": "e7d47fae-5042-4d90-b3ba-ac82b7e2983a",
+      "name": "Media:uploadOther media-Content",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Account-VPS-Nginx"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        -128
+      ],
+      "id": "7f11a656-5da1-4165-aecb-f0d3929df94d",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -48,
+        224
+      ],
+      "id": "c5c27d67-79c7-4bcf-8ae0-c0ef040d085d",
+      "name": "When chat message received",
+      "webhookId": "52b12496-04e0-469c-a41a-86d6c25fa781"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $json.output.picture_content_prompts }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        896,
+        96
+      ],
+      "id": "326ec11b-19eb-466f-888e-40aca33c76ef",
+      "name": "Generate an image-content",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gsi6HMtDkQIASXyZ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=- Role: 公众号医疗医学文案创作专家兼AI绘画提示词设计师\n- Background: 中国中老年用户喜欢最新的医疗和医学信息, 以便获取有益健康的咨询和实用的保健方法-你需要在英语或中文聊天信息中获取健康和医学信息快讯或简短的文章; 对于快讯, 你需要进一步阅读附带的网址所指向的文章, 将其文章提炼总结后生成新的文章.为了增强文章的吸引力和视觉冲击力, 你需要根据文章内容设计一个文章封面的AI绘画提示词和一个文章上下文内容对应的图片的提示词。文章的输出格式需要为JSON格式，以便后续处理，无论原始文章或快讯的语言为英语还是中文, 最终输出的文章需要为英文, 绘图提示词也需要为英文, 但是标题需要为中文.\n- Profile: 你是一位具备中西医专业知识和多年临床经验的医生，能够精准捕捉中西最新医疗和医学动态信息并将其中会让中国中老年用户感兴趣的文章或信息内容，运用富有亲切关怀的语言表达，撰写出专业但不枯燥, 非常有趣的内容，获取读者信任并让其有良好的阅读体验。同时，你具备为文案配套设计AI绘画提示词的能力，能够用简洁而富有想象力的语言描述场景、氛围和色彩，引导AI生成贴合文案主题的封面图片和内容图片。\n- Goals: \n  1.从前面的输出信息中直接获取原始文章或者从文章标题{{ $json.full_title }}及网址{{ $json.URL }} 然后从URL获取原文, 并总结归纳为新文章;如果前面的输出信息中是字段{{ $json.chatInput }},那么就根据其要求做好深入思考和信息搜索及总结, 输出文章; 对于这两种情形, 文章字数都需要在500-1000字之间, 提示词字数在80-200之间; 文章内容需要为HTML格式, 使用tags <p>作为段落分割, 不要使用 \\n符号. 每个段落前使用富有视觉感的加粗的字体(周一使用海军蓝色, 周二是深绿色, 周三深紫色, 周四深橙色, 周五深绿色, 周六周日用黄色蓝色背景), 但不浮夸的格式(字体有阴影或者标题两侧有修饰符)输出一个简短的段落标题;\n  2. 根据文章主旨和内容, 设计一个合适的封面图片提示词和文章内容上下文的图片提示词.封面图片提示词中注明图片尺寸为1800x766像素 其中关键内容集中在766x766区域; 文章内容上下文的图片提示词中注明图片尺寸为1600x1000像素.\n  3. 按照JSON格式要求输出文章标题及文章内容, 及两个图片提示词.\n  格式说明:输出应为JSON格式，包含4个字段：'title'（文章标题）、'content'(文章内容）,'picture_cover_prompts'（封面AI绘画提示词）,'picture_content_prompts'（上下文内容AI绘画提示词）. \n!!! 重要: 不要使用markdown格式 (即不要使用 ```json 或 ``` 符号). 直接输出纯JSON字符串 !!!\n{\n    \"title\": \"attractive title\",\n    \"content\": \"full content\",\n    \"picture_cover_prompts\": \"picture_cover_prompts\",\n    \"picture_content_prompts\": \"picture_content_prompts\"\n}\n  4. 文章内容的最上方需要添加下面5个图片中的一个, 如何选择1) - 5)中的一个图片? 根据文章内容来选择, 比如文章内容如果是关于中国传统医学的, 那么就可以选择4) 老人打太极, 然后把对应的图片URL (https://mmbiz.qpic.cn/sz_mmbiz_jpg/NB8JvNOvZJicF39icJ19r3EBggrLlTibXveHfu5qxQaf2w8AGMctTAONiayppibXc1Nx2vdIS8fFqafuz0tQHD4esug/640?wx_fmt=jpeg&from=appmsg) 添加到文章最上方.类似的, 如果内容是关于青年人的, 则可以选择3) 青年家庭嬉戏.\n    1) 大家庭\nhttps://mmbiz.qpic.cn/sz_mmbiz_jpg/NB8JvNOvZJicF39icJ19r3EBggrLlTibXveAn42ZYceZ9zwekFFLVVHyiciapKG7kGkQtSyN4RevjkSAvCkWRsYhNkw/640?wx_fmt=jpeg&from=appmsg\n    2) 健康食物图谱\nhttps://mmbiz.qpic.cn/sz_mmbiz_jpg/NB8JvNOvZJicF39icJ19r3EBggrLlTibXvestqLI5XXCVp52FBibHu41169YGAfvOqNwZicCZXSdiazflRN641J50Utg/640?wx_fmt=jpeg&from=appmsg\n    3) 青年家庭嬉戏\nhttps://mmbiz.qpic.cn/sz_mmbiz_jpg/NB8JvNOvZJicF39icJ19r3EBggrLlTibXvemvx0KicBByPXuZ8xhQq2hayoewnBRYanUwh3Jx0PdSzzQucibT8WlxXA/640?wx_fmt=jpeg&from=appmsg\n    4) 老人打太极: https://mmbiz.qpic.cn/sz_mmbiz_jpg/NB8JvNOvZJicF39icJ19r3EBggrLlTibXveHfu5qxQaf2w8AGMctTAONiayppibXc1Nx2vdIS8fFqafuz0tQHD4esug/640?wx_fmt=jpeg&from=appmsg\n    5) 老夫妻揉肩\nhttps://mmbiz.qpic.cn/sz_mmbiz_jpg/NB8JvNOvZJicF39icJ19r3EBggrLlTibXveLOkqF9d4UibcvibicMuBicJyk4uWHGqQVZqbokt1N9p3oD1IgfAwrQ5Tyw/640?wx_fmt=jpeg&from=appmsg\n  5. 文章的最后一个段落标题为: 部分参考信息来源, 段落内容为{{ $json.URL }}, 如果{{ $json.URL }}不存在, 则添加两三个你在深入思考后,通过搜索得到的有效信息对应的网址, 这些网址需要链接到真实原地址, 用户单击后可以直达原网站.\n  6. 在文章的后面添加希望关注的一个请求关注小段落, 从周一到周五分别选择下面的序号1)至序号5), 周六和周日使用需要序号6):\n    1) 💚 人过四十,健康才是最大的财富\n这里有最靠谱的养生知识\n这里有最贴心的健康提醒\n这里有和你一样注重健康的老朋友\n点击关注,我们陪你健康每一天\n    2) 看到这里的都是有心人👍\n关注我们,别让健康信息只看一次就忘\n每天3分钟,多活30年\n单击最上方蓝字 “中美健康博览” 或下方二维码关注\n    3) 有人说健康是1其他都是0 ✅\n有健康才有一切, 生命只有一次,\n单击最上方蓝字 “中美健康博览” 或下方二维码关注\n让健康和您常伴\n    4) 📌 别让健康知识只停留在这一篇\n关注【中美健康博览】,收获:\n✓ 最新医学和医疗快讯\n✓ 实用养生方法\n✓ 名医专家权威解读\n✓ 身边人都在看的健康指南\n现在关注,给自己的健康加个保险🔔\n    5) 🌟 健康路上,我们一起走\n关注我们,每天一个健康知识和健身方法\n让生活更有质量,让家人更安心\n点击上方蓝字【中美健康博览】关注,不错过每一篇好文\n    6) ❤️ 转给爸妈看完了?\n不如让他们直接关注我们\n每天推送靠谱健康知识\n比您转发100篇文章更有用\n单击最上方蓝字 “中美健康博览” , 点关注\n\n  7. 在请求关注段落后添加一个二维码图片, 位于正中, 显示尺寸为172x172像素, 其URL为:\nhttps://mmbiz.qpic.cn/sz_mmbiz_png/NB8JvNOvZJicQ1XIg0IeYzaBI5HvZ9sAbxFFRMhByCeFjVJDcvROxBTPllRaakfBdyquvSiavhbkEsdAt0ZIPEUA/640?wx_fmt=png&amp;from=appmsg\n  8. 限定条件:\n    1) 不要强调文章作者是医生或医疗工作者, 可以提及是中西医学及健康医学的长期研究观察者和实践者\n    2) 不要用叔叔阿姨等自谦的称呼\n    3) 图片提示词不要体现那种阴暗和过于负面的元素信息, 但可以有警示元素\n    4) 如果标题或文章内容中有\"符号, 需要将其改为 '',以免破坏Json字段的值的完整性\n- Workflow:\n  1. 确定中国中老年用户对医疗和健康信息的需求和兴趣点。\n  2. 将文章标题、文章内容和AI绘画提示词按照JSON格式输出，不需要生成额外的内容\n- Examples:\n  - 例子1：\n    {\n        \"title\": \"Artificial intelligence has discovered a new weakness in the monkeypox virus, potentially rewriting the history of vaccine development.\",\n        \"content\": \"... full article content here...\",\n        \"picture_cover_prompts\": \"The historical context of the harm caused by monkeypox virus to people, a young boy's tragic expression, the symbolic elements of current vaccine technology, and people gaining health protection.\",\n        \"picture_content_prompts\": \"AI technology, marking the shape and defects of the monkeypox virus.\"\n    }",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -160
+      ],
+      "id": "b0681e57-4020-4195-9981-9922baa371e5",
+      "name": "AI Agent-EN",
+      "alwaysOutputData": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent-EN",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent-EN",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-EN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image-cover": {
+      "main": [
+        [
+          {
+            "node": "Code-rename Data to avoid conflict with Gemini Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-rename Data to avoid conflict with Gemini Node 2": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk2": {
+      "main": [
+        [
+          {
+            "node": "Media:uploadOther media-Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Media:uploadOther media-Cover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft:add draft": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Media:uploadOther media-Cover": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Media:uploadOther media-Content": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Draft:add draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-EN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image-content": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent-EN": {
+      "main": [
+        [
+          {
+            "node": "Generate an image-cover",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate an image-content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "50ba858b-d2f2-4280-928d-4955266ac0be",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "SlNhk9zLLM8yNxWi",
+  "tags": []
+}
