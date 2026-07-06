@@ -1,0 +1,686 @@
+{
+  "name": "W3-Medium-Substack-文章生成-via-Wechat",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        48
+      ],
+      "id": "92b5b41d-7cf9-4040-939d-34b735e7dcf6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "832hCpF6Z5cNNRlF",
+          "name": "OpenAi account-Ollama Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE",
+          "mode": "list",
+          "cachedResultName": "中西医学博览-微信公众号",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Article-Chosen",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "date",
+              "lookupValue": "={{ $now.toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -992,
+        -320
+      ],
+      "id": "198fa4ab-00c4-46dc-bbbe-e58512fd753d",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Q1salEETFZjoO8bO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        -224
+      ],
+      "id": "f0b5a170-8b30-4dd4-84c7-f028ae1f8495",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1168,
+        -384
+      ],
+      "id": "12069a0b-6fd4-4447-ab2b-11500cf18f56",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/Volumes/M2T/zCache/n8n_output/image/gemini_image_cover_{{ $now.format('yyyy-MM-dd-HHmm') }}.png",
+        "dataPropertyName": "img_flash",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        -240
+      ],
+      "id": "bff7d112-bec2-4459-971e-252dc7fb1900",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/Volumes/M2T/zCache/n8n_output/image/gemini_image_content_{{ $now.format('yyyy-MM-dd-HHmm') }}.png",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        -32
+      ],
+      "id": "b71cf48e-fb07-4ce8-9602-c73faac6bfac",
+      "name": "Read/Write Files from Disk2"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $json.picture_cover_prompts }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        944,
+        -240
+      ],
+      "id": "a5903e86-2686-446d-91e4-76a3b55f8a16",
+      "name": "Generate an image-cover",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gsi6HMtDkQIASXyZ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if binary data exists\nif (items[0].binary && items[0].binary.data) {\n    // Create a new container named 'img_flash' and copy the data there\n    items[0].binary.img_flash = items[0].binary.data;\n    // Optional: Delete the old 'data' container to keep things clean\n    delete items[0].binary.data;  //Don;t delete, the 2nd READ/Write Node need that as a default container\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        -240
+      ],
+      "id": "ab297562-ea40-4123-8713-cf5cc5a30e79",
+      "name": "Code-rename Data to avoid conflict with Gemini Node 2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1776,
+        -176
+      ],
+      "id": "5812d3c9-7bff-4b6f-97b9-6fb7c988488f",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "draft:add",
+        "articles": "=[\n  {\n    \"article_type\": \"news\",\n    \"title\": \"{{ $('Code-solid-AI-Output').item.json.title }}\",\n    \"author\": \"David\",\n    \"digest\": \"{{ $('Code-solid-AI-Output').item.json.title }}\",\n    \"content\": {{ JSON.stringify($('Code-Add-Image-Into-Content').item.json.final_content) }},\n\n    \"thumb_media_id\": \"{{ $('Media:uploadOther media-Cover').first().json.media_id }}\",\n    \"need_open_comment\": 1,\n    \"only_fans_can_comment\": 0\n  }\n]"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -272
+      ],
+      "id": "89ea7fd2-220a-4462-89db-03d4280303b0",
+      "name": "Draft:add draft",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Account-VPS-Nginx"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "media:uploadOther",
+        "inputDataFieldName": "img_flash"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        -240
+      ],
+      "id": "9acfb6a1-1a85-4a19-8ce1-6a934e7a79a5",
+      "name": "Media:uploadOther media-Cover",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Account-VPS-Nginx"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "media:uploadOther"
+      },
+      "type": "n8n-nodes-wechat-offiaccount.wechatOfficialAccountNode",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        -32
+      ],
+      "id": "8a3d039a-be96-499c-a6ff-6cf8b7c8e7f5",
+      "name": "Media:uploadOther media-Content",
+      "credentials": {
+        "wechatOfficialAccountCredentialsApi": {
+          "id": "KTaIQMu2k3K6b2Hd",
+          "name": "Wechat Account-VPS-Nginx"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        -256
+      ],
+      "id": "f26657a2-4007-4bde-8995-5f4b904758b2",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -832,
+        192
+      ],
+      "id": "e94c96a0-35d2-4b39-90ef-f9a66480f62f",
+      "name": "When chat message received",
+      "webhookId": "c97c4e35-806a-476f-8eed-8ac85855c770"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash-image",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash-image (Nano Banana)"
+        },
+        "prompt": "={{ $json.picture_content_prompts }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        944,
+        -32
+      ],
+      "id": "a9fe8453-191c-4131-9c01-465b82782d41",
+      "name": "Generate an image-content",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Gsi6HMtDkQIASXyZ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Role: 通晓 DMA Thinking Models 对应书籍\"Actionable Thinking Models\"的智者兼AI绘画提示词设计师\n# Background及Profile: 书籍\"Actionable Thinking Models\"的作者David Adams 是一个通晓古今中外历史名人和故事的人, David 从这些名人和故事中提炼了一套12个智慧模式(思维模型), 并撰写了书籍\"Actionable Thinking Models\"的一书, 你熟悉并完全掌握了书中介绍的各个思维模型. 现在你需要根据聊天信息的事例或要求,从12个DMA思维模型中选择一个. 然后撰写一篇博客文章用于书籍的宣传,文章的内容中需要提及聊天信息中的要求或问题, 然后围绕选定的模型来解决用户的聊天信息中提到的具体要求或问题;文章的风格应该是专业和生动有趣的, 引人入胜, 并产生购买书籍的冲动. 文章中需要添加一些对应的图片, 所以你还要设计两个AI绘画提示词和语言对应起来-一个绘画提示词是针对整篇文章的概要图片, 另一个图片是用于最重要的文章段落, 提示词需要根据该段落的内容来设计。文章的输出格式需要为JSON格式，以便后续处理，文章内容和绘图提示词需要为英文,但是文章标题需要为中文.\n# Goals: \n  ## 1.从前面的输出信息中获取要求内容{{ $('Code-solid-AI-Output-Model').item.json.chatInput }},以及确定的DMA思维模型{{ $('Code-solid-AI-Output-Model').item.json.ModelChosen }}; \n  ## 2.读取对应选定模型的全部章节内容,彻底了解这个选定模型的特点及创建方法和多个实例(在文章中列出二到三个实例和对使用者的几种种益处), 为下面的文章撰写获取资料和灵感;如果模型章节内容和聊天信息中的要求或问题没有直接关系, 则你需要进一步搜索网络获取更多模型需要的信息, 以便让你的文章更有说服力, 不要让文章内容显得空洞无味. 下面是模型的全部章节内容: \n{{ $json.text }},\n  ## 3.撰写一篇文章:用第三方的语言重述原始的要求或问题, 然后利用这个模型来解决聊天信息中的要求或问题, 或说明为何某种做法是对某个模型的具体应用实例. 文章中可以简单描述模型创建过程, 但无需特别详细;文章字数需要在700-1000字之间, 提示词字数在80-200之间; 文章内容需要为HTML格式, 使用tags <p>作为段落分割, 不要使用 \\n符号. 每个段落前使用富有视觉感的加粗的字体(周一使用海军蓝色, 周二是深绿色, 周三深紫色, 周四深橙色, 周五深绿色, 周六周日用深绿色), 但不浮夸的格式,字体可以有阴影,但不要使用反白形式; \n  ## 4.撰写两个图片提示词, 提示词中需要注明图片尺寸为1600x1000像素; 针对整篇文章的概要图片的提示词, 生成的图片不要太抽象, 最好有具体的事物,如果前面的要求信息中已有明确的事物, 尽量添加到提示词中; 用于最重要的文章段落的图片提示词需要根据该段落的内容来设计, 尽量贴切和生动.\n  ## 5. 文章的最后一个段落标题为: 📘 Learn More from Actionable Thinking Models ,内容如下:\nExplore the full Book from: 👉 Amazon or Apple Books.\nor get only this Model chapter: {{ $('Code-solid-AI-Output-Model').item.json.ModelChosen }} from Amazon.\n\n# 格式说明:\n  最终输出应为JSON格式，包含4个字段：'title'（文章标题）、'content'(文章内容）,'picture_cover_prompts'（文章主题AI绘画提示词）,'picture_content_prompts'（上下文内容AI绘画提示词）. \n!!! 重要: 不要使用markdown格式, 不要使用 ```json 或 ``` 符号. 直接输出纯JSON字符串. Return only raw JSON.Do not include any introductory or concluding text. !!!\nExample of output json format:\n{\n    \"title\": \"有吸引力的中文标题\",\n    \"content\": \"full content\",\n    \"picture_cover_prompts\": \"picture_cover_prompts\",\n    \"picture_content_prompts\": \"picture_content_prompts\"\n}  \n\n# 限定条件:\n    1) 不要提及作者名字超过1次, 并且仅仅提及作者的Last Name;\n    2) 不要用太直接和露骨的方式去推销书籍;\n    3) 图片提示词不要体现那种阴暗和过于负面的元素信息, 但可以有警示元素;\n    4) 如果文章标题或文章内容中有\"符号, 需要将其改为\\\",以免破坏Json字段的值的完整性.\n\n# Workflow:\n  1. 确定读者大众对提升自我思维的需求和兴趣点;\n  2. 撰写文章和AI绘图提示词\n  3. 按照JSON格式输出文章标题、文章内容和AI绘画提示词，不需要生成额外的内容\n## Examples: (!!! 重要: 不要使用markdown格式 (即不要使用 ```json 或 ``` 符号). 直接输出纯JSON字符串 !!!)\n    {\n        \"title\": \"Did Pakistan Really Shoot Down Rafales? The Filter Model Cuts Through Propaganda\",\n        \"content\": \"... full article content here...\",\n        \"picture_cover_prompts\": \"Two military fighter jets flying high above a winding river on a clear day, seen from an aerial viewpoint. One jet has a sleek gray body with red and orange markings, the other is painted dark green with a white crescent and star insignia. Both aircraft are banked slightly as if engaged in formation flight or maneuvering in open sky, with visible contrails trailing behind them. The landscape below shows patchwork fields, river bends, and shadows from scattered clouds. Vibrant, high-resolution aviation photography style, realistic lighting, dramatic composition, crisp details.\",\n        \"picture_content_prompts\": \"Detailed concept art of two sleek military jets in mid-air, stylized dynamic motion, dramatic sky and winding river below, digital painting with bold colors and sharp highlights.\"\n    }",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        448,
+        -288
+      ],
+      "id": "a545867d-93dc-431f-8d62-c6dc3d3d849d",
+      "name": "AI Agent-撰文",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -560,
+        64
+      ],
+      "id": "a844ba64-0c75-4950-9b8f-3f31b1735d99",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "832hCpF6Z5cNNRlF",
+          "name": "OpenAi account-Ollama Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "=/Users/dma/dmk/1-Book/DMA/DMA-Chapter-Split/{{ $json.ModelChosen }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -288
+      ],
+      "id": "098b6bc7-d968-472e-bff4-49dd51ea2df3",
+      "name": "Read/Write Files from Disk",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Role: DMA Thinking Models 书籍的作者兼AI绘画提示词设计师\n# Background及Profile: 你是一个通晓古今中外历史名人和故事的人, 并从这些名人和故事中提炼了一套12个智慧模式(思维模型), 并撰写了DMA Thinking Models一书, 你熟悉并完全掌握了书中介绍的各个思维模型. 现在你需要根据聊天信息的事例或要求,从12个DMA思维模型中选择最适合的一个. \n# Goals: \n  ## 1.搜索网络, 确认前面的输出信息中的内容{{ $json.chatInput }} 是正确的, 如果有部分错误, 需要修改为正确内容, 无论是否修改, 最后输出为新字段chatInput.\n  ## 2.根据前面的(修改后,正确的)输出信息中的内容, 结合下面模型介绍来判断需要使用具体哪个DMA思维模型; \n  ## 3.模型介绍:\n  ### 12 DMA Thinking Models:\n\n### chapter-3 创新模型(九星汇聚模型) Innovation Model(9-Star Gathering Model)\n    Innovation is the driving force behind human progress, and individuals who have the ability to think\ninnovatively are often the winners in their careers and personal lives. However, for most people, innovation\nis not an easy feat to accomplish. The lack of effective tools or methods is the main reason - that's why\nsubjective efforts often fell short and yielded no results.\nIn this chapter, we present an effective, efficient, and practical model for innovative thinking. By learning\nthis model, you can unleash your innovative potential, let your own innovative ideas spring up and create\nmodels that apply to various scenarios, or use new methods to solve old problems, gaining advanced and\nexceptional returns.\n    Scenario: The DMA Innovation Model, also called 9−Star Gathering Model can broaden innovative\nthinking. In the business field, it can provide ideas for creating new products or and transforming/optimizing\nexisted products or services, helping to find new ways to break through and solve problems. It can also be\na helpful tool for readers in other fields, such as scientific research, artistic idea/creation, and interpersonal\ncommunication, making innovation simple.\n### Chapter-4 关联模型(遥控器模型) Correlation Model(Remote Control Model) \n    A foundational model: Correlation Model (Remote Control Model). This model is specifically designed to discover hidden and difficult-to-detect relationships between human,things/objects and components.Its benefits lie in helping model creators uncover potential opportunities to achieve excess financial and other benefits, or give you an edge over competitors. Unlike the Innovation Model in the previous chapter, when different analysts possess the same or similar data for this model, they may get similar results. Therefore, getting more precise data and timing are both crucial.\n\n    Scenario: There are many connections between things, some of which are clear, such as horizontal\nand vertical blood relationships within a large family, the correlation between cold temperatures in fall and\nthe changing in color and falling of leaves. However, there are also hidden relationships that are pervasive\nbut more difficult to perceive, such as key critical associations that promote scientific breakthroughs,\nbalancing and alliances in solving political challenges, and many other ways that enable us to identify\nbusiness opportunities and tackle challenges in our work and daily life.\n### Chapter-5 要素分析模型(积木模型) Factor Analysis Model(Building Blocks Model)\n    A fundamental model: Factor Analysis Model - the Building Blocks Model.\nIt is an important foundational model that often needs to be utilized first when creating various other models.\nThis model identifies the various internal and external factors that have a significant impact on a thing,\nthus laying the groundwork for further analysis. The elements of things are relatively static and less\ninteresting, so reading this chapter may not be very exciting. However, I hope readers patiently continue\nreading and grasp the principles and methods of this model, that will be highly beneficial for creating other\nmodels.\n    Scenario: We often assume that we are smart enough and possess sufficient knowledge to analyze\nand solve various problems. However, many times we fail due to a lack of basic understanding of things.\nThere are also instances when we perceive things to be simple but fail to consider all aspects when making\ndecisions. We rely solely on our familiar analytical approach and, as a result, miss out on many\nopportunities or suffering setbacks. The occurrence of these problems is primarily because of subjective\nfactors, but objectively, it is often because we lack basic analytical tools.\n### Chapter-6 事物发展和预测模型(生态圈模型) Things Development & Prediction Model(Ecosystem Model)\n    The world and people around us, even a small part of it, is complex. This complexity comes from the\nthings themselves and the mutual influence and interaction between them at different levels from different\ndirections. Is there an effective thinking method to analyze it?\nSome readers may have heard of System Thinking, which has been proven effective for analyzing\nsystems - complex enough to reflect small part of world. However, only a minority of the elite class is\nfamiliar with it, leaving the general public unable to benefit from it.\nThe Ecosystem Model is based on the theory & practice of Systems Thinking, providing readers at all\nlevels with an easy-to-use visualization tool for analyzing and handling the complexity. It also extends\nSystems Thinking by adding quantitative calculations.\nWhen it's used in conjunction with the Factor Analysis Models (see previous chapter 5) - we can take\nadvantages of the key factors being identified by the Factor Analysis Models, then use the Ecosystem\nModel more effectively and accurately to analyze the development direction and result of any complex\nthing/system.\n    Scenario: An ecosystem is characterized by multilevel food chains, parasitism, symbiosis, and other\nrelationships between plants and animals, which is one of the best analogies we can use to describe a\nmodel for systems thinking. The Ecosystem Model can assist creators in effectively and dynamically\nanalyzing complex systems at multiple levels. We can apply it to various scenarios, ranging from designing\ntransportation systems for metropolis to personal career planning or a position competition.\nThe model can also help us find the factors and directions that can influence things easily, find out\nways to change the trend, thus attain greater gains or prevent losses.\n### Chapter-7 选择与评价模型(矩阵模型) Selection & Evaluation Model(Matrix Model)\n    Model Overview: This chapter introduces a commonly used model: the Selection and Evaluation\nModel (Matrix Model). This model can analyze multiple options, tabulated in a two-dimensional matrix, and\nuses simple arithmetic operations to help you objectively and accurately determine the best option (the\ncalculations are much easier than Ecosystem Model).\nIt also aids model creators and users in avoiding the drawbacks of hasty decision-making, while helping\nto ease their indecision and internal anxieties, quickly clarify thoughts from interconnected information and\nclues.\n    Scenario: Life is made up of one choice after another. The choices of the past make us who we are\ntoday, the choices of today will make us who we will be tomorrow.\nSome people argue that choice is more important than effort. While this statement may not capture the\nwhole picture, it does highlight the undeniable significance of making wise choices.\nIn addition to life decisions such as choosing a college major, career path, and life partner, there are\nalso many choices that need to be made in our daily lives and work such like deciding whether to buy or\nrent a house, choosing an electric or gasoline-powered vehicle, or just an appropriate model among\nmultiple brands of a blue tooth speaker.\nIncorrect choices can lead to unnecessary financial and time losses. If one makes a wrong choice in an\nimportant milestone of life, it can result in a lifelong regret.\n    Another type of problem that models can address is the quantification and rating of multiple similar\nentities, which is implemented in exactly the same way as choosing the optimal among multiple options.\nThe primary objective of most quantification ratings is to prioritize and select one or more options at the\ntop, while some focus on classifying various groups/categories to improve efficiency.\n### Chapter-8 面向需求模型(杠铃模型) Needs-Oriented Model(Barbell Model)\n    Model Overview: Everyone has his/her own needs, and so does every organization and country.\nHuman needs drive a variety of interests and emotional connections that shape interpersonal relationships.\nFor situations where other people are involved, it is often more effective to approach by focusing on\nmeeting others' needs in order to achieve our own goals or objectives. By doing so, we can often\naccomplish our objectives with greater ease and efficiency, also gain long-term benefits. Conversely, if we\nneglect this, our efforts may be in vain.\n    Scenario: We can observe that a few people around us, whether at work or in social interactions,\npossess a remarkable ability to conduct themselves and communicate in a manner that leaves a positive\nand lasting impression. Consequently, it seems that they often resolve their own matters and achieve\nsuccessful outcomes easily.\nThere is a perception that these individuals possess a high emotional intelligence (EQ). Is it true that a\nhigh EQ leads to a successful life?\nPeople with high EQ may be popular, but high EQ only works in interpersonal interactions. It doesn't\nnecessarily help solve most business and technical problems, e.g., some product managers consistently\ncome up with products that users love, while some other product managers though seemingly intelligent\n(high IQ and/or high EQ), fail so many times.\nActually, success in the business and technology domains is rooted in the same principles as those with\nhigh EQ. Both rely on the ability to meet the needs of others. People with high EQ know how to cater to\nself-esteem needs of people, while product managers need to deeply understand the explicit or implicit\nneeds of customers for their products.\nWait, are self-esteem needs the same as the need for a phone? Keep reading please.\n    The Needs-Oriented Model (Barbell Model) introduced in this chapter is to help readers realize an\naltruistic plus self-interested thinking model in scenarios where people are involved, then to achieve the\nmodel creator's own goals easily.\nFor any analysis case in any scenario, if people directly involved or people's interests involved, we may\nconsider to create a Barbell Model first, before creating any other type of DMA thinking models.\n### Chapter-9 问题剖析模型(蜂巢模型) Problem Dissection Model(Honeycomb Model)\n    Scenario: We may encounter a variety of questions & problems, including\njudgmental problems, causal problems, obstructive problems, and developmental problems.\nThese problems differ in their manifestations, nature, and solutions. However, correctly and\ncomprehensively understanding a problem is crucial. Failing to accurately grasp a problem, relying solely\non intuition and assumptions, often leads to various judgment errors and consequent losses.\nModel Overview: The Honeycomb Model was designed to help model users accurately understand\nand dissect various problems and judgments/statement.\n    After such a dissection, solutions to many problems become clear. However, the primary benefit of the\nHoneycomb Model lies not in causal analysis and solving methods; for a deeper exploration of the roots\ncause of more complex problems, we can use the Collapsible Telescope Model (chapter 11), which needs\nHoneycomb Model's results as input, so do any other DMA models once a problem gets involved.\n\n### Chapter-10 问题拆解模型(放大镜模型) Problem Segmentation Model(Magnifying Glass Model)\n    The Magnifying Glass Model divides a matter or problem into multiple smaller parts, which can be\nphysical, temporal, or logical divisions. Each part can be further subdivided into smaller parts, allowing the\nmodel creator to gain deeper insights into the problem and see through to the core with every details. This\nmodel is for knowing problem's details, through which to perceive the essence of the problem - so it's not\nlike Honeycomb Model which is created to understand question/problem's meaning.\nDifferent perspectives (multiple attributes or characteristics of the object) can be used to divide an object\nor problem. Let's take applying for a visa as an example. From a time-series perspective, it can be divided\ninto preparation, form filling, payment, and collection. Alternatively, from the point of ensuring successful\napplication, it can be divided into analyzing weaknesses, addressing weaknesses, selecting\nintermediaries, and remedial measures. It's model creator's own preference or the object/problem's natural\nattributes suggests how to divide it.\nConsidering the purpose, the solution-oriented division methods are much better. Also, if time permitted,\nit's a good idea to use multiple segmentation perspectives to gain a complete understanding of the\nobject/problem from different aspects.\n    Scenario: Everyday, we face numerous things and some of them are questions/problems, and often,\nat first glance, we feel like we already fully understand these problems. However, this feeling is usually\nincomplete or even completely wrong, as it overlooks many details.\nWhen we need to recall something, we often only remember the general idea. This prevents us from\ntruly understanding the entirety and essence of things, making it difficult to conduct further and deeper\nanalysis.\nThe degree to which one grasps the details of things and their connections is key to distinguishing\nbetween an average person and an expert. So, how can we analyze things? Simply answer is, we can\nbreak down any object, phenomenon or problem into smaller components.\nEven if it's not naturally prone to decomposition, many things can be logically segmented. The process\nof breaking down things is akin to using a magnifying glass to examine various parts of an object.\nModel Overview: The Magnifying Glass Model, as the name suggests, focuses on examining the\nvarious parts of an object or problem. When we analyze something, imagine using a magnifying glass to\nobserve every detail of an artwork; some intricate details that are not visible to the naked eye will become\napparent.\n\n### Chapter-11 问题根源分析模型(伸缩望远镜模型) Root Cause Analysis Model(Collapsible Telescope Model)\n    Model Overview: This chapter introduces the third model for problem analysis: the Collapsible\nTelescope Model. Unlike the Magnifying Glass model, which breaks down and help comprehensively\nunderstand the layered details of a problem itself, the Collapsible Telescope Model is a powerful tool\nhelping users to analyze the root causes of a problem, involving other things that contribute to the\noccurrence of the problem.\nThis model combines divergent and convergent thinking, more interesting with a bit more effort. Its\nbenefit lies in helping users dig deep to uncover the root causes of two types of problems: those caused\nby human nature, and those caused by the objective things.\nIdentifying the root causes helps find the solid and once-and-for-all solution to gain the most benefits or\nminimize losses to the greatest extent; it also allows for foreseeing potential problems and preparing to\navoid or mitigate them in advance.\n    Scenario: After gaining a clear understanding of a problem through the Honeycomb or Magnifying\nGlass Model, often we need to delve deeper into analyzing the root causes of the problem.\nFor example, if a company's product frequently encounters issues during winter, initially it may seem to\nbe caused by temperature factors. However, apart from the obvious solution of implementing insulation\nmeasures, better solutions often arise from deeper analysis of why these problems occur during winter -\nwhat the underlying reasons are.\nIdentifying the root cause of problems and deriving the most effective and cost-efficient solution is a\nchallenge that individuals face in many circumstances.\n### Chapter-12 归类与规律模型(过滤器模型) Inductive Analysis Model (Filter Model) \n    Model Overview: The Classification & Pattern (Filter Model) was designed to address such\nquestions/problems.\nIt will initially identify the important attributes of the major category (for example, forest fire-prone areas)\nand the quantified importance of these attributes. Then it compares TBA (the Thing Being Analyzed) with\nthese attributes to determine their alignment and degree of fit, assessing TBA's probability of same\nclassification of the major category. It mitigates personal subjective biases, leading to more accurate\njudgments.\nWhen information for analysis is insufficient, the model can also provide the direction and type of\ninformation to search, aiding model creators in achieving their analytical goals.\n    Scenario: We often encounter uncertainty problems and do not have enough information to make\njudgment and analyze. How should we analyze these problems, and what information should we gather to\nassist our analysis and action? As examples below,\n• A manager is strongly promoting the adoption of new AI technology. Is it for the company's benefit or personal\ninterest, or both?\n• There are widespread rumors about fraud presidential election process. How can we judge the truthfulness or\ndetermine the extent of accuracy of those rumors?\n• Some countries are experiencing severe wildfires. Does our region also have a similar risk?\nFor these questions or problems, people tend to judge based on their long-held personal views or\nsubjective preferences, but such subjective initial reactions often lead to erroneous conclusions; most\npeople rely on their personal intuition as the starting point for quick action, but this often leads to failures\ndue to incorrect judgments. For these types of problems, we need the help of rational and efficient tool.\n\n### Chapter-13 四维立体决策模型(坐标系模型) Four-Dimensional Decision-Making Model(Coordinate System Model)\nModel Overview: The Coordinate System Model combines intuition and reason. Based on many\nsuccessful decision-making instances in history, it's designed to provide eight directions of analysis paths,\nwhich not only reflect the important role of rationality but also help promotes to generate more ideas and\ninspirations along with regulated intuition.\nThe model does not require extensive knowledge or experience to build, but it requires careful study of\nthe decision subject and a certain level of expertise. A comprehensive analysis can prevent the omission\nof important factors and protects model creators from being misled by superficial or majority opinions.\nWithin the model framework, multi-dimensional and multilevel information can be well organized, ensuring\neffectiveness and efficiency.\n    Scenario: Herbert Alexander Simon, the founder of the Science of Decision Making (1916-2001, Nobel\nLaureate in Economics in 1978), once says, 'Decision-making is the heart of management.' Decision-making is essential in national governance, corporate management, and specific areas like financial and personnel management. For individuals, it is equally vital, whether choosing a career path or making parenting decisions. Sound decision-making is crucial in all forms of management. \nIn simple terms, decision-making is the process of making a thoughtful choice that offers long-term\nvalue or benefits when faced with important options. Decision-making often involves choosing between\nmultiple options. Can we use the Selection & Evaluation Model (Matrix Model) introduced earlier (Chapter 7) to aid in decision-making?\nAlthough the discriminant factors in the two-dimensional Selection Model play an important role, they\ncan only provide a rough estimate without applying any systematic analysis. Let's take the example of\nchoosing a foreign university for the Selection Model, if we need to analyze the future economic\ndevelopment of that country, and we can use a discriminant factor like 'economic development prospect', the model creator can only give an imprecise assessment, otherwise he/she needs to do more meticulous and in-depth research - even more than the whole process of creation of the Selection Model.However, if the model creator is now planning to immigrate, a comprehensive analysis of the economic prospects of the country is very important and quite necessary, a rough, single-value assessment from the Selection Model is insufficient. Obviously, though 'Decision-making' seems like making a choice between options, but the main point is not 'Select' but 'Deep research'. However, for those important choice, we can use both models to analyze to gain the best result with confidence.\n    The Coordinate System Model (Coordinate System Model) is a powerful tool for comprehensive\ndecision-making from four dimensions. It systematizes and streamlines the decision-making process,\nreducing the pressure on decision makers when dealing with complicated and diverse information sources.\nIt also helps expand thinking and prevent omissions, making it suitable for various decision-making\nscenarios.\nWe can see many rational decision-making methods, but Bezos's view that the best decisions come\nfrom intuition has still been proven effective. Whether decisions should be based on rationality or intuition\nremains controversial, but most professional scholars, including Drucker, acknowledge the importance of\nintuition in decision-making.\nIn my opinion, intuition comes from the prolonged accumulation of personal experience and cognition\nin the mind, so the role of intuition varies greatly for different individuals. Intuition without the accumulation\nand sedimentation of experience is unreliable. While creating a Coordinate System Model, the main\nprocess is based on reason - the components and process of the model ensures the objectivity, but\ncreators' intuition can help to improve it.\n\n### Chapter-14 信息系统模型(神经树网模型) Information System Model   (Neural Tree Network Model) \n    Scenario: In the preface of this book, we highlighted the World Economic Forum's predictions about\nthe most essential workplace skills. Among these skills, learning ability frequently appeared alongside\nvarious thinking abilities. Thinking and learning are inherently connected - effective thinking methods\nenhance learning ability, while knowledge gained through learning provides the foundation to improve\nthinking skills.\nLearning ability includes two aspects:\n(1) The ability to understand complex knowledge deeply and quickly.\n(2) The ability to apply knowledge to practice.\nBoth aspects are essential. The biggest challenge in the learning process is the complexity of knowledge\nitself—an overwhelming amount of content to understand and memorize, varying levels and relationships\nbetween topics, and their intricate connections, all of which make it difficult for learners to manage.\nLearning ability, although not requiring inspiration like innovation ability, would likely see a significant\nincrease in efficiency if learning could be as interesting as exploring unknown territories. This chapter will\nintroduce a thinking model specifically designed for mastering complex knowledge - information systems -\nthe Neural Tree Network model. It can help users quickly clarify complex knowledge, grasp the\nrelationships between knowledge components, enhance understanding, and promote long-term memory.\nIn the education field, a successful approach pioneered by Summit Public Schools in the US involves\nstarting from knowledge application scenarios, which encourages learners to actively explore various\nknowledge points. This method enables average, non-elite students to master knowledge and successfully\nenter universities. Similarly, when constructing a Neural Tree Network model, adopting an envisioning and\nverifying approach for knowledge components - can significantly enhance understanding and promote\nlong-term memory retention, though this is not a mandatory requirement (for the model creation).\n    Summary: Grand structures, such as galaxies in the universe and the countless neurons in the human\nbrain, are organized in a tree-like structure—the most efficient way of organizing information observed in\nnature. This concept inspired the design and name of the Neural Tree Network Model, which can be used\nto map and analyze any knowledge or information system.\nThis model helps systematically organize knowledge, facilitating learning and understanding. It is\nequally applicable to comprehending complex systems, whether it's a software project, a country's legal\nsystem, or any intricate structure. Moreover, when you need to explain complex systems you've created—\nsuch as a novel sales approach—you can use this model to present your ideas, making them more\naccessible and easier to grasp\n\n### Chapters' PDF file name:\nChapter-1-2-What is DMA Thinking Model & How Can You Benefit from it.pdf\nChapter-3-Innovative Thinking - 9−Star Gathering Model.pdf\nChapter-4-Discover the Correlation between Things - Remote Control Model.pdf\nChapter-5-Identify Factors of Things - Building Blocks Model.pdf\nChapter-6-Things Development & Prediction - Ecosystem Model.pdf\nChapter-7-Best Choice & Evaluation - Matrix Model.pdf\nChapter-8-Targeting Needs, Achieve More - The Barbell Model.pdf\nChapter-9-To Solve a Problem, First Understand it - Honeycomb Model.pdf\nChapter-10-Segment Complex Matters - Magnifying Glass Model.pdf\nChapter-11-Identify Root Cause - Collapsible Telescope Model.pdf\nChapter-12-Classification & Pattern - Filter Model.pdf\nChapter-13-Four-Dimensional Decision Making - Coordinate System Model.pdf\nChapter-14-Master Complex Information Systems - Neural Tree Network Model.pdf\n\n# 格式说明:\n  最终输出应为JSON格式，包含3个字段：'chatInput'（聊天信息）、'ModelChosen'(选定模型）、'Reason' (选择该模型的原因）. \n!!! 重要: 不要使用markdown格式 (即不要使用 ```json 或 ``` 符号). 直接输出纯JSON字符串 !!!\n{\n    \"chatInput\": \"modified, requirement or message from chat\",\n    \"ModelChosen\": \"Model chapter and name\",\n    \"Reason\": \"Why did I choose this model\"\n}  \n\n# 限定条件:\n    1) 只能选择一个模型, 如果所有模型都无法满足要求, 可以选择最接近的一个模型;\n    2) 输出模型字段字符串为模型对应的章节PDF文件名称\n\n- Workflow:\n  1. 确定读者大众对提升自我思维的需求和兴趣点;\n  2. 基于输入的信息{{ $json.chatInput }} (或修改后的内容),选择最合适的模型\n  3. 按照JSON格式输出原始的聊天信息、选定的模型章节号和模型名称以及为何选择这个模型，不需要生成额外的内容\n- Examples:\n  - 例子1：\n    {\n        \"chatInput\": \"paste The original chatInput\",\n        \"ModelChosen\": \"Chapter-3-Innovative Thinking - 9−Star Gathering Model.pdf\",\n        \"Reason\": \"There is  cluster thingking method from this Innovative Thinking \"\n    }",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -528,
+        -272
+      ],
+      "id": "2ff4077c-781d-46cd-b641-7f7e10a5a043",
+      "name": "AI Agent-选择DMA模型",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        272,
+        -288
+      ],
+      "id": "514bacad-8538-4f27-a573-7e9ade5d774b",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the output from the AI Agent node\nconst aiOutput = $input.first().json.output || $input.first().json.text; \n\n// 2. Helper to clean Markdown wrappers\nfunction cleanMarkdown(text) {\n    const jsonMatch = text.match(/```json\\s*([\\s\\S]*?)\\s*```/) || text.match(/```\\s*([\\s\\S]*?)\\s*```/);\n    return jsonMatch ? jsonMatch[1] : text;\n}\n\nlet jsonString = cleanMarkdown(aiOutput);\nlet finalData = {};\n\ntry {\n    // STRATEGY A: Try standard parsing first (Best Case)\n    finalData = JSON.parse(jsonString);\n\n} catch (e) {\n    // STRATEGY B: Landmark Extraction (The \"Nuclear Option\")\n    // This assumes the keys are output in a specific order. \n    // It extracts text strictly between the known keys, ignoring quotes/commas in between.\n\n    const extractField = (fullText, startKey, endKey) => {\n        // 1. Find where the start key begins (e.g., \"title\":)\n        const startIdx = fullText.indexOf(`\"${startKey}\"`);\n        if (startIdx === -1) return null;\n\n        // 2. Determine where the value starts (after the colon)\n        // We look for the first colon after the start key\n        const colonIdx = fullText.indexOf(\":\", startIdx);\n        if (colonIdx === -1) return null;\n        \n        // 3. Find the start of the NEXT key to know where to stop\n        let endIdx;\n        if (endKey) {\n            endIdx = fullText.indexOf(`\"${endKey}\"`, colonIdx);\n        } else {\n            // If no endKey (it's the last item), look for the very last closing brace\n            endIdx = fullText.lastIndexOf(\"}\");\n        }\n\n        if (endIdx === -1) return null;\n\n        // 4. Extract the raw chunk between them\n        let rawValue = fullText.substring(colonIdx + 1, endIdx).trim();\n\n        // 5. CLEANUP: Remove the trailing comma if it exists\n        if (rawValue.endsWith(',')) {\n            rawValue = rawValue.slice(0, -1).trim();\n        }\n\n        // 6. CLEANUP: Remove the surrounding quotes\n        // This handles the specific issue of: \"My \"Title\"\" -> My \"Title\"\n        if (rawValue.startsWith('\"') && rawValue.endsWith('\"')) {\n            rawValue = rawValue.slice(1, -1);\n        }\n\n        // 7. Unescape standard JSON escapes (like \\n or \\\") so the text is readable\n        // We use a simple replace for common escapes to avoid JSON.parse errors\n        try {\n            // Try to interpret standard escapes\n            rawValue = JSON.parse(`\"${rawValue.replace(/\"/g, '\\\\\"')}\"`);\n        } catch (err) {\n            // If that fails, just return the raw string with manual cleanup\n            rawValue = rawValue.replace(/\\\\\"/g, '\"').replace(/\\\\n/g, '\\n');\n        }\n\n        return rawValue;\n    };\n\n    // We define the key flow. If the LLM misses a key, this might break, \n    // but it handles the \"illegal quotes\" issue perfectly.\n    finalData = {\n        title: extractField(jsonString, \"title\", \"author\"), // Assuming author is after title\n        // If \"author\" isn't in your list, change \"author\" to \"digest\" or \"content\"\n        // Based on your previous prompt, the order seems to be: \n        // title -> content -> picture_cover_prompts -> picture_content_prompts\n        \n        // ADJUST THESE \"endKey\" PARAMETERS TO MATCH YOUR EXACT AI OUTPUT ORDER\n        title: extractField(jsonString, \"title\", \"content\"), \n        content: extractField(jsonString, \"content\", \"picture_cover_prompts\"),\n        picture_cover_prompts: extractField(jsonString, \"picture_cover_prompts\", \"picture_content_prompts\"),\n        picture_content_prompts: extractField(jsonString, \"picture_content_prompts\", null), // null means find the end }\n        \n        _status: \"parsed_with_landmark_fallback\"\n    };\n}\n\n// 3. Return the object\nreturn finalData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        -288
+      ],
+      "id": "b31c6451-e2ca-4f47-8084-097638f04d30",
+      "name": "Code-solid-AI-Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the article text (Using .first() to avoid item linking errors)\nconst content = $('Code-solid-AI-Output').first().json.content;\n\n// 2. Get the URL for the second image\nconst imageUrl = $('Media:uploadOther media-Content').first().json.url;\n\n// 3. Create the HTML image tag\nconst imageHtml = `<br><img src=\"${imageUrl}\" alt=\"Image\" style=\"width: 100%; border-radius: 8px;\" /><br>`;\n\n// 4. Inject the image after the SECOND paragraph\nlet newContent;\nlet count = 0; // Initialize a counter to track paragraphs\n\nif (content.includes('</p>')) {\n  // HTML Mode: Find closing paragraph tags </p>\n  // We use a \"callback function\" inside replace to count them\n  newContent = content.replace(/<\\/p>/g, (match) => {\n    count++;\n    if (count === 3) { \n      // If this is the 2nd paragraph, append the image after the tag\n      return match + imageHtml;\n    }\n    // Otherwise, just return the tag as is\n    return match;\n  });\n} else {\n  // Plain Text Mode: Find double newlines \\n\\n\n  newContent = content.replace(/\\n\\n/g, (match) => {\n    count++;\n    if (count === 2) {\n      // If this is the 2nd break, insert: Newline + Image + Newline\n      return match + imageHtml + match;\n    }\n    return match;\n  });\n}\n\n// SAFETY FALLBACK: \n// If the article is short (has less than 2 paragraphs), 'count' will be less than 2.\n// In that case, we append the image to the very end so it isn't lost.\nif (count < 2) {\n  newContent = content + imageHtml;\n}\n\n// 5. Output the result\nreturn {\n  json: {\n    final_content: newContent\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        -32
+      ],
+      "id": "c41cf343-7a96-425d-923f-7e107238ce11",
+      "name": "Code-Add-Image-Into-Content"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the output from the AI Agent node\nconst aiOutput = $input.first().json.output || $input.first().json.text; \n\n// 2. Helper to clean Markdown wrappers\nfunction cleanMarkdown(text) {\n    if (!text) return \"\";\n    const jsonMatch = text.match(/```json\\s*([\\s\\S]*?)\\s*```/) || text.match(/```\\s*([\\s\\S]*?)\\s*```/);\n    return jsonMatch ? jsonMatch[1] : text;\n}\n\nlet jsonString = cleanMarkdown(aiOutput);\nlet finalData = {};\n\ntry {\n    // STRATEGY A: Try standard parsing first (Best Case)\n    finalData = JSON.parse(jsonString);\n\n} catch (e) {\n    // STRATEGY B: Landmark Extraction (The \"Nuclear Option\")\n    // This extracts text strictly between known keys, ignoring illegal quotes inside values.\n\n    const extractField = (fullText, startKey, endKey) => {\n        // 1. Find where the start key begins\n        const startIdx = fullText.indexOf(`\"${startKey}\"`);\n        if (startIdx === -1) return null;\n\n        // 2. Find the colon after the key\n        const colonIdx = fullText.indexOf(\":\", startIdx);\n        if (colonIdx === -1) return null;\n        \n        // 3. Find the start of the NEXT key (or end of object)\n        let endIdx;\n        if (endKey) {\n            // Look for the next key starting from where the current value begins\n            endIdx = fullText.indexOf(`\"${endKey}\"`, colonIdx);\n        } else {\n            // If no endKey, look for the very last closing brace\n            endIdx = fullText.lastIndexOf(\"}\");\n        }\n\n        if (endIdx === -1) return null;\n\n        // 4. Extract the raw chunk\n        let rawValue = fullText.substring(colonIdx + 1, endIdx).trim();\n\n        // 5. Cleanup: Remove trailing comma\n        if (rawValue.endsWith(',')) {\n            rawValue = rawValue.slice(0, -1).trim();\n        }\n\n        // 6. Cleanup: Remove surrounding quotes \n        if (rawValue.startsWith('\"') && rawValue.endsWith('\"')) {\n            rawValue = rawValue.slice(1, -1);\n        }\n\n        // 7. Cleanup: Try to unescape standard characters (\\n, \\\")\n        // This makes the text readable if the AI actually did escape some things correctly.\n        try {\n            // We wrap it in quotes and parse it as a standalone JSON string to handle escapes\n            rawValue = JSON.parse(`\"${rawValue.replace(/\"/g, '\\\\\"')}\"`);\n        } catch (err) {\n            // Fallback: manual replace if JSON.parse fails\n            rawValue = rawValue.replace(/\\\\\"/g, '\"').replace(/\\\\n/g, '\\n');\n        }\n\n        return rawValue;\n    };\n\n    // Apply extraction in the expected order:\n    finalData = {\n        // 1. chatInput stops when ModelChosen starts\n        chatInput: extractField(jsonString, \"chatInput\", \"ModelChosen\"),\n        \n        // 2. ModelChosen stops when Reason starts\n        ModelChosen: extractField(jsonString, \"ModelChosen\", \"Reason\"),\n        \n        // 3. Reason goes until the end of the JSON object\n        Reason: extractField(jsonString, \"Reason\", null),\n        \n        _status: \"parsed_with_landmark_fallback\"\n    };\n}\n\n// 3. Return the object containing ALL fields\nreturn finalData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        -272
+      ],
+      "id": "20946268-c3dc-4e8f-a14d-e8c136496042",
+      "name": "Code-solid-AI-Output-Model"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent-撰文",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image-cover": {
+      "main": [
+        [
+          {
+            "node": "Code-rename Data to avoid conflict with Gemini Node 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-rename Data to avoid conflict with Gemini Node 2": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk2": {
+      "main": [
+        [
+          {
+            "node": "Media:uploadOther media-Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Media:uploadOther media-Cover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft:add draft": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Media:uploadOther media-Cover": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Media:uploadOther media-Content": {
+      "main": [
+        [
+          {
+            "node": "Code-Add-Image-Into-Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Draft:add draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-选择DMA模型",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image-content": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent-撰文": {
+      "main": [
+        [
+          {
+            "node": "Code-solid-AI-Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent-选择DMA模型",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent-选择DMA模型": {
+      "main": [
+        [
+          {
+            "node": "Code-solid-AI-Output-Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-撰文",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-solid-AI-Output": {
+      "main": [
+        [
+          {
+            "node": "Generate an image-cover",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate an image-content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-Add-Image-Into-Content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code-solid-AI-Output-Model": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7e72b59c-3630-46e5-a517-0e0cc68dd07f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "P8UmG7AcgaaJ7PK5",
+  "tags": []
+}

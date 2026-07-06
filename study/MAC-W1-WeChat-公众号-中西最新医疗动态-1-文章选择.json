@@ -1,0 +1,247 @@
+{
+  "name": "W1-WeChat-公众号-中西最新医疗动态-1-文章选择",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        176
+      ],
+      "id": "50091e89-af9b-48ba-8396-94032b8b92b7",
+      "name": "When chat message received",
+      "webhookId": "82117459-1ce8-43c5-b346-a55a49fcbe27"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Role: 公众号医疗医学文案创作专家兼AI绘画提示词设计师\n# Background: 中国中老年用户喜欢最新的医疗和医学信息, 以便获取有益健康的咨询和实用的保健方法-你首先需要在英语或中文聊天信息中获取多条健康和医学信息快讯或简短的文章或者根据聊天信息要求上网深度搜索, 然后根据中国中老年用户的兴趣从中选择一条出来(如果聊天信息中明确说明不要选择某条, 则选择另外一条中国中老年用户最感兴趣的文章/标题),并为其配套生成一个吸引人的AI绘画封面提示词及对应上下文信息的图片的提示词，以增强文章的吸引力和视觉冲击力。输出格式需要为JSON格式，以便后续处理，输出语言需要和原始的语种一致.\n# Profile: 你是一位具备中西医专业知识和多年临床经验的医生，能够精准捕捉中美最新医疗和医学动态新闻信息并将其中会让中国中老年用户感兴趣的文章或信息内容，同时，你具备为文案配套设计AI绘画提示词的能力，能够用简洁而富有想象力的语言描述封面的场景、氛围和色彩，引导AI生成贴合文案主题的封面图片和内容图片。\n# Goals: \n  ## 1.判断聊天信息类型: \n    ### 第1类(1)聊天信息的第一行是1:, 下面一行或多行是一条或多条快讯内容\n    ### 第2类(2)聊天信息的第一行是2:, 下面各行是具体要求\n  ## 2. 根据聊天信息类型来决定下一步\n    ### 对于第1类(1)聊天信息是多条快讯内容, 你需要从聊天信息提供的所有内容中提取一条中国中老年用户会感兴趣的内容标题(如果聊天信息中明确说明不要选择某条, 则选择另外一条中国中老年用户最感兴趣的文章/标题), 然后返回你选中的内容/标题, 并说明为何选中这两条的原因.\n    按照JSON格式要求输出选中的文章标题, 对于URL字段, 需要填写True, 同时填写选中的原因\n    输出格式: 输出应为JSON格式，包含7个字段：\"date\" (需要使用今天日期),\"simple_title\"（简要标题）、\"full_title\"(原聊天中的文章标题或信息摘要）,'URL'(是否需要原文网址或真实网址)及\"picture_cover_prompts\"（封面AI绘画提示词）,\"picture_content_prompts\"（上下文内容AI绘画提示词） 及\"reason\" (选择该条的理由). 不需要生成额外的内容，输出格式如下：\n!!! 重要: 不要使用markdown格式 (即不要使用 ```json 或 ``` 符号). 直接输出纯JSON字符串 !!!\n{\n  \"date\": \"<date>\",     \n  \"simple_title\": \"<simple_title>\",\n  \"full_title\": \"<full_title>\",\n  \"URL\": \"<URL>\",\n  \"picture_cover_prompts\": \"<picture_cover_prompts>\",\n  \"picture_content_prompts\": \"<picture_content_prompts>\",\n  \"reason\": \"<reason>\"\n}\n注意: 输出的任何字段内容中如果有\"符号, 需要改为', 以免破坏json格式\n  #### Workflow:\n  ##### 1. 确定中国中老年用户对医疗和健康信息的需求和兴趣点。\n  ##### 2. 如果聊天信息内容为多条快讯, 则逐条检查聊天信息中的各条信息 {{ $json.chatInput }}, 只选择中国中老年用户可能感兴趣的文章或快讯; (如果聊天信息中明确说明不要选择某条, 则选择另外一条中国中老年用户最感兴趣的文章/标题)\n  #####4. 如果标题或快讯非常简短则在输出中将URL字段设置为true\n  #####5. 将简短标题、原标题和AI绘画提示词及是否需要提供原文网址及选中该文章/快讯标题的原因, 按照JSON格式进行，不需要生成额外的内容.\n  ##### Examples:\n!!! 重要: 不要使用markdown格式 (即不要使用 ```json 或 ``` 符号). 直接输出纯JSON字符串 !!!\n注意: 输出的任何字段内容中如果有\"符号, 需要改为', 以免破坏json格式\n\n  ###### 例子：\n    {\n        \"date\": \"2025-12-27\",\n        \"simple_title\": \"猴痘疫苗进展\",\n        \"full_title\": \"人工智能发现猴痘病毒新弱点，有望重写疫苗研发历史\",\n        \"URL\": \"true\",\n        \"picture_cover_prompts\": \"历史上猴痘病毒对人们的危害背景, 一个小男孩悲惨的表情, 现在疫苗技术的标志元素, 人们获得健康保障\",\n        \"picture_content_prompts\": \"AI技术, 猴痘病毒外形及缺陷点标记\",\n        \"reason\": \"选中这个文章/标题, 是因为中国中老年用户关心自身及儿孙辈的健康, 对于关机猴痘病毒的危险早有耳闻, 这条医学快讯会让他们安心\"\n    }\n    ### 对于第2类(2)聊天信息是具体要求的情况, 你根据其要求完成任务.\n    按照JSON格式要求输出选中的文章标题, 对于URL字段, 需要填写可访问到该文章的真实网址;同时填写选中的原因;\n    输出格式: 输出应为JSON格式，包含7个字段：\"date\" (需要使用今天日期),\"simple_title\"（简要标题）、\"full_title\"(原聊天中的文章标题或信息摘要）,'URL'(原文网址)及\"picture_cover_prompts\"（封面AI绘画提示词）,\"picture_content_prompts\"（上下文内容AI绘画提示词） 及\"reason\" (选择该条的理由). 不需要生成额外的内容，输出格式如下：\n!!! 重要: 不要使用markdown格式 (即不要使用 ```json 或 ``` 符号). 直接输出纯JSON字符串 !!!\n注意: 输出的任何字段内容中如果有\"符号, 需要改为', 以免破坏json格式\n{\n  \"date\": \"<date>\",     \n  \"simple_title\": \"<simple_title>\",\n  \"full_title\": \"<full_title>\",\n  \"URL\": \"<True URL>\",\n  \"picture_cover_prompts\": \"<picture_cover_prompts>\",\n  \"picture_content_prompts\": \"<picture_content_prompts>\",\n  \"reason\": \"<reason>\"\n}\n  #### Workflow:\n  ##### 1. 确定中国中老年用户对医疗和健康信息的需求和兴趣点。\n  ##### 2. 按聊天信息的中要求完成文章搜索和文章网址确认;\n  #####4. 根据其要求完成文章标题搜索, 并将URL字段设置为真实文章网址,不要设置为TRUE;\n  #####5. 将简短标题、原标题和AI绘画提示词及真实网址及选中该文章的原因, 按照JSON格式输出，不需要生成额外的内容.\n  ##### Examples:\n!!! 重要: 不要使用markdown格式 (即不要使用 ```json 或 ``` 符号). 直接输出纯JSON字符串 !!!\n注意: 输出的任何字段内容中如果有\"符号, 需要改为', 以免破坏json格式\n   ###### 例子：\n    {\n        \"date\": \"2025-12-27\",\n        \"simple_title\": \"侯女士和民营体验机构的冲突\",\n        \"full_title\": \"民营体验机构可信吗? 潜在疾病被耽误, 谁之过?\",\n        \"URL\": \"https://www.jacc.org/doi/10.1016/j.jacc.2025.12.23\",\n        \"picture_cover_prompts\": \"民营体验机构背景和匆匆忙忙体验的人群\",\n        \"picture_content_prompts\": \"萦绕在人们头顶的问号, 我的身体谁说了算\",\n        \"reason\": \"选中这个文章/标题, 是因为中国中老年用户关心自身及儿孙辈的健康, 对于每年体验很关心\"\n    }\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        464,
+        176
+      ],
+      "id": "4362e240-f809-47f2-804f-2ee504724583",
+      "name": "AI Agent-1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        384
+      ],
+      "id": "e8978793-3f79-4553-8a44-543d50d08431",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "832hCpF6Z5cNNRlF",
+          "name": "OpenAi account-Ollama Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE",
+          "mode": "list",
+          "cachedResultName": "中西医学博览-微信公众号",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Article-Chosen",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "simple_title": "={{ $json.simple_title }}",
+            "full_title": "={{ $json.full_title }}",
+            "URL": "={{ $json.URL }}",
+            "picture_cover_prompts": "={{ $json.picture_cover_prompts }}",
+            "picture_content_prompts": "={{ $json.picture_content_prompts }}",
+            "reason": "={{ $json.reason }}",
+            "date": "={{ $now.toFormat('yyyy-MM-dd')}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "simple_title",
+              "displayName": "simple_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "full_title",
+              "displayName": "full_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "picture_cover_prompts",
+              "displayName": "picture_cover_prompts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "picture_content_prompts",
+              "displayName": "picture_content_prompts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        208
+      ],
+      "id": "e3c28ab3-8e74-4fa6-9adc-7ad4800e9bad",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Q1salEETFZjoO8bO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the output from the AI Agent node\nconst aiOutput = $input.first().json.output || $input.first().json.text; \n\n// 2. Helper to clean Markdown wrappers\nfunction cleanMarkdown(text) {\n    if (!text) return \"\";\n    const jsonMatch = text.match(/```json\\s*([\\s\\S]*?)\\s*```/) || text.match(/```\\s*([\\s\\S]*?)\\s*```/);\n    return jsonMatch ? jsonMatch[1] : text;\n}\n\nlet jsonString = cleanMarkdown(aiOutput);\nlet finalData = {};\n\ntry {\n    // STRATEGY A: Try standard parsing first (Best Case)\n    finalData = JSON.parse(jsonString);\n\n} catch (e) {\n    // STRATEGY B: Landmark Extraction (The \"Nuclear Option\")\n    // This ignores broken syntax (like unescaped quotes inside values)\n    // and simply slices text between known keys.\n\n    const extractField = (fullText, startKey, endKey) => {\n        // 1. Find start key\n        const startIdx = fullText.indexOf(`\"${startKey}\"`);\n        if (startIdx === -1) return null;\n\n        // 2. Find colon\n        const colonIdx = fullText.indexOf(\":\", startIdx);\n        if (colonIdx === -1) return null;\n        \n        // 3. Find start of NEXT key (or end of object)\n        let endIdx;\n        if (endKey) {\n            endIdx = fullText.indexOf(`\"${endKey}\"`, colonIdx);\n        } else {\n            endIdx = fullText.lastIndexOf(\"}\");\n        }\n\n        if (endIdx === -1) return null;\n\n        // 4. Extract raw chunk\n        let rawValue = fullText.substring(colonIdx + 1, endIdx).trim();\n\n        // 5. Cleanup: Remove trailing comma\n        if (rawValue.endsWith(',')) {\n            rawValue = rawValue.slice(0, -1).trim();\n        }\n\n        // 6. Cleanup: Remove surrounding quotes \n        if (rawValue.startsWith('\"') && rawValue.endsWith('\"')) {\n            rawValue = rawValue.slice(1, -1);\n        }\n\n        // 7. Cleanup: Try to unescape standard characters\n        try {\n            rawValue = JSON.parse(`\"${rawValue.replace(/\"/g, '\\\\\"')}\"`);\n        } catch (err) {\n            rawValue = rawValue.replace(/\\\\\"/g, '\"').replace(/\\\\n/g, '\\n');\n        }\n\n        return rawValue;\n    };\n\n    // Apply extraction in the specific order:\n    finalData = {\n        date: extractField(jsonString, \"date\", \"simple_title\"),\n        \n        simple_title: extractField(jsonString, \"simple_title\", \"full_title\"),\n        \n        full_title: extractField(jsonString, \"full_title\", \"URL\"),\n        \n        URL: extractField(jsonString, \"URL\", \"picture_cover_prompts\"),\n        \n        picture_cover_prompts: extractField(jsonString, \"picture_cover_prompts\", \"picture_content_prompts\"),\n        \n        picture_content_prompts: extractField(jsonString, \"picture_content_prompts\", \"reason\"),\n        \n        // The last field goes until the end of the JSON object\n        reason: extractField(jsonString, \"reason\", null),\n        \n        _status: \"parsed_with_landmark_fallback\"\n    };\n}\n\n// 3. Return the object containing ALL fields\nreturn finalData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        192
+      ],
+      "id": "b370b11f-7e5f-4285-92ae-ac8fa6565769",
+      "name": "Code-solid-AI-Output"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent-1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent-1": {
+      "main": [
+        [
+          {
+            "node": "Code-solid-AI-Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code-solid-AI-Output": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "25de4fd6-d41f-41a2-926a-0c2c8caac2af",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b872b5634b6a3dcc9d1e7e4c7c12708ead03dbe36d1b61ceac052869576c7e2c"
+  },
+  "id": "YwtGdPQFDk7fsgTG",
+  "tags": []
+}

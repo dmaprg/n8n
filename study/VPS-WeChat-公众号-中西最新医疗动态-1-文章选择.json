@@ -1,0 +1,285 @@
+{
+  "name": "WeChat-公众号-中西最新医疗动态-1-文章选择",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -672,
+        16
+      ],
+      "id": "5f1c3fed-bab4-4505-b566-ba39380db0a1",
+      "name": "When chat message received",
+      "webhookId": "82117459-1ce8-43c5-b346-a55a49fcbe27"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=- Role: 公众号医疗医学文案创作专家兼AI绘画提示词设计师\n- Background: 中国中老年用户喜欢最新的医疗和医学信息, 以便获取有益健康的咨询和实用的保健方法-你首先需要在英语或中文聊天信息中获取多条健康和医学信息快讯或简短的文章, 然后根据中国中老年用户的兴趣从中选择一条出来(如果聊天信息中明确说明不要选择某条, 则选择另外一条中国中老年用户最感兴趣的文章/标题),并为其配套生成一个吸引人的AI绘画封面提示词及对应上下文信息的图片的提示词，以增强文章的吸引力和视觉冲击力。输出格式需要为JSON格式，以便后续处理，输出语言需要和原始的语种一致.\n- Profile: 你是一位具备中西医专业知识和多年临床经验的医生，能够精准捕捉中美最新医疗和医学动态信息并将其中会让中国中老年用户感兴趣的文章或信息内容，运用富有亲切关怀的语言表达，撰写出专业但不枯燥有趣的内容，获取读者信任并让其有良好的阅读体验。同时，你具备为文案配套设计AI绘画提示词的能力，能够用简洁而富有想象力的语言描述封面的场景、氛围和色彩，引导AI生成贴合文案主题的封面图片和内容图片。\n- Goals: \n  1.从聊天信息提供的所有内容中提取一条中国中老年用户会感兴趣的内容标题(如果聊天信息中明确说明不要选择某条, 则选择另外一条中国中老年用户最感兴趣的文章/标题), 然后返回你选中的内容/标题, 并说明为何选中这两条的原因.\n  2. 按照JSON格式要求输出两条选中的文章或标题, 同时说明选中的原因\n- OutputFormat: 输出应为JSON格式，包含7个字段：\"date\" ( 今日日期和时间),\"simple_title\"（简要标题）、\"full_title\"(原聊天中的文章标题或信息摘要）,'URL'(是否需要原文网址)及\"picture_cover_prompts\"（封面AI绘画提示词）,\"picture_content_prompts\"（上下文内容AI绘画提示词） 及\"reason\" (选择该条的理由). 不需要生成额外的内容，输出格式如下：\n{\n  \"date\": \"<date>\",     \n  \"simple_title\": \"<simple_title>\",\n        \"full_title\": \"<full_title>\",\n  \"URL\": \"<URL>\",\n  \"picture_cover_prompts\": \"<picture_cover_prompts>\",\n  \"picture_content_prompts\": \"<picture_content_prompts>\",\n        \"reason\": \"<reason>\"\n}\n- Workflow:\n  1. 确定中国中老年用户对医疗和健康信息的需求和兴趣点。\n  2. 逐条对应聊天信息中的各条信息 {{ $json.chatInput }}, 只选择中国中老年用户可能感兴趣的文章或快讯; (如果聊天信息中明确说明不要选择某条, 则选择另外一条中国中老年用户最感兴趣的文章/标题)\n  3. 如果选中的文章长度足够长, 则直接采用该文章; 如果标题或快讯非常简短则在输出中将URL字段设置为true。\n  6. 将简短标题、原标题和AI绘画提示词及是否需要提供原文网址及选中该文章/快讯标题的原因, 按照JSON格式进行，不需要生成额外的内容\n- Examples:\n  - 例子1：\n    {\n        \"date\": \"202512271707\"\n        \"simple_title\": \"猴痘疫苗进展\",\n        \"full_title\": \"人工智能发现猴痘病毒新弱点，有望重写疫苗研发历史\",\n        \"URL\": \"true\",\n        \"picture_cover_prompts\": \"历史上猴痘病毒对人们的危害背景, 一个小男孩悲惨的表情, 现在疫苗技术的标志元素, 人们获得健康保障\",\n        \"picture_content_prompts\": \"AI技术, 猴痘病毒外形及缺陷点标记\",\n        \"reason\": \"选中这个文章/标题, 是因为中国中老年用户关心自身及儿孙辈的健康, 对于关机猴痘病毒的危险早有耳闻, 这条医学快讯会让他们安心\"\n    }\n \n- Initialization: 你是公众号爆文文案创作专家兼AI绘画提示词设计师。请从「聊天信息」中选中一条中国中老年用户最可能感兴趣的文章或标题，如果聊天信息中明确说明不要选择某一天, 则你需要选择另一条用户最可能感兴趣的文章或标题; 同时，设计一个封面的AI绘画提示词和一个上下文内容对应的图片的提示词, 并且输出你选中这个文章/标题的原因。并按格式输出",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -432,
+        16
+      ],
+      "id": "2d8372b5-3fdf-4c03-9ef5-2308657f238f",
+      "name": "AI Agent-1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "gemini-3-flash-preview"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -560,
+        224
+      ],
+      "id": "8f4dafea-714e-42a4-b38a-e9f41c18e430",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "YeKYVVjTZrcYEydh",
+          "name": "OpenAi account-Ollama.com-Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"date\": \"<date>\",     \n  \"simple_title\": \"<simple_title>\",\n  \"full_title\": \"<full_title>\",\n  \"URL\": \"<URL>\",\n  \"picture_cover_prompts\": \"<picture_cover_prompts>\",\n  \"picture_content_prompts\": \"<picture_content_prompts>\",\n  \"reason\": \"<reason>\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        368
+      ],
+      "id": "35e3777d-8160-4be6-81a8-3f3a6043d436",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "deepseek-v3.1:671b",
+          "mode": "list",
+          "cachedResultName": "deepseek-v3.1:671b"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        480
+      ],
+      "id": "2e42e537-1c62-4818-9d11-e4892805985d",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "YeKYVVjTZrcYEydh",
+          "name": "OpenAi account-Ollama.com-Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE",
+          "mode": "list",
+          "cachedResultName": "中西医学博览-微信公众号",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Article-Chosen",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qR6yCQRtFWUuGk5vEdoaZX-r8Ia3EyeHNGQW9il3_qE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "simple_title": "={{ $json.output.simple_title }}",
+            "full_title": "={{ $json.output.full_title }}",
+            "URL": "={{ $json.output.URL }}",
+            "picture_cover_prompts": "={{ $json.output.picture_cover_prompts }}",
+            "picture_content_prompts": "={{ $json.output.picture_content_prompts }}",
+            "reason": "={{ $json.output.reason }}",
+            "date": "={{ $now.toFormat('yyyyMMddHHmm')}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "simple_title",
+              "displayName": "simple_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "full_title",
+              "displayName": "full_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "picture_cover_prompts",
+              "displayName": "picture_cover_prompts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "picture_content_prompts",
+              "displayName": "picture_content_prompts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reason",
+              "displayName": "reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -80,
+        16
+      ],
+      "id": "eeb9d6a3-b269-4036-b33c-945ce9aae502",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NRjuN6hA1Z8fq4IJ",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent-1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent-1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent-1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "31ebfc38-ca56-4112-ae47-72ab6e57ea69",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "12f0d30c2db45d5524435e2f0f5b058febe8da38c51c8ed2794a2e05357f05c0"
+  },
+  "id": "qyHYTCM6pikBRWg6",
+  "tags": []
+}
